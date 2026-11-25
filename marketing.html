@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="See every cooler, spot shelf gaps, and make smarter merchandising decisions with KoolerIQ."
+    />
+    <meta name="theme-color" content="#f5f8fc" />
+    <title>KoolerIQ — Every cooler. A clearer picture.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #10233d;
+        --muted: #64748b;
+        --blue: #087fbd;
+        --blue-dark: #05699f;
+        --line: #e2eaf2;
+        --paper: #fff;
+        --canvas: #f5f8fc;
+        --green: #0e9f77;
+        font-family: 'DM Sans', sans-serif;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body { margin: 0; color: var(--ink); background: var(--canvas); }
+      a { color: inherit; text-decoration: none; }
+      button { font: inherit; }
+      .page { overflow: hidden; }
+      .wrap { width: min(1160px, calc(100% - 48px)); margin: 0 auto; }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        height: 72px;
+        background: rgb(255 255 255 / 88%);
+        border-bottom: 1px solid rgb(226 234 242 / 80%);
+        backdrop-filter: blur(16px);
+      }
+      .nav { position: relative; height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+      .brand { display: inline-flex; align-items: center; gap: 10px; font: 800 19px 'Plus Jakarta Sans', sans-serif; letter-spacing: -.7px; }
+      .brand-mark {
+        width: 34px; height: 34px; display: grid; place-items: center; color: white;
+        border-radius: 11px; background: linear-gradient(145deg, #18a8d7, #0879b8);
+        box-shadow: 0 6px 15px rgb(8 127 189 / 25%);
+      }
+      .brand-mark svg { width: 22px; height: 22px; }
+      .nav-links { display: flex; align-items: center; gap: 32px; color: #53647a; font-size: 13px; font-weight: 600; }
+      .nav-links a:hover { color: var(--blue); }
+      .nav-cta, .button {
+        display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+        min-height: 44px; padding: 0 18px; border: 0; border-radius: 10px;
+        background: var(--blue); color: white; font-weight: 700; font-size: 13px;
+        box-shadow: 0 8px 18px rgb(8 127 189 / 18%); transition: transform .2s, background .2s, box-shadow .2s;
+      }
+      .nav-cta:hover, .button:hover { background: var(--blue-dark); transform: translateY(-2px); box-shadow: 0 12px 24px rgb(8 127 189 / 25%); }
+      .button.secondary { color: var(--ink); background: white; border: 1px solid var(--line); box-shadow: 0 3px 10px rgb(16 35 61 / 4%); }
+      .button.secondary:hover { background: #f9fbfd; }
+      .button svg { width: 16px; height: 16px; }
+
+      .hero {
+        position: relative; padding: 88px 0 84px;
+        background:
+          radial-gradient(ellipse at 75% 30%, rgb(91 193 225 / 14%), transparent 36%),
+          radial-gradient(ellipse at 5% 10%, rgb(113 177 228 / 12%), transparent 34%),
+          linear-gradient(180deg, #fbfdff 0%, #f2f7fc 100%);
+      }
+      .hero::before, .hero::after {
+        content: ''; position: absolute; width: 7px; height: 7px; border-radius: 50%;
+        background: #57bfde; opacity: .5; animation: drift 6s ease-in-out infinite;
+      }
+      .hero::before { top: 18%; left: 9%; }
+      .hero::after { top: 30%; right: 7%; width: 5px; height: 5px; animation-delay: -2s; }
+      .hero-grid { display: grid; grid-template-columns: .88fr 1.12fr; align-items: center; gap: 54px; }
+      .eyebrow {
+        display: inline-flex; align-items: center; gap: 8px; padding: 7px 11px;
+        color: #096f9e; background: #e9f7fc; border: 1px solid #d5edf7;
+        border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .075em; text-transform: uppercase;
+      }
+      .eyebrow-dot { width: 7px; height: 7px; background: #16a77e; border-radius: 50%; box-shadow: 0 0 0 4px rgb(22 167 126 / 12%); }
+      h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
+      h1 { max-width: 550px; margin: 22px 0 18px; font-size: clamp(42px, 5.2vw, 66px); line-height: 1.06; letter-spacing: -3.2px; }
+      .gradient-text { color: var(--blue); }
+      .hero-copy { max-width: 470px; color: #5a6c81; font-size: 16px; line-height: 1.75; }
+      .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+      .hero-proof { display: flex; align-items: center; gap: 11px; margin-top: 26px; color: #718198; font-size: 11px; }
+      .avatar-stack { display: flex; padding-left: 5px; }
+      .avatar-stack span { width: 25px; height: 25px; margin-left: -5px; display: grid; place-items: center; border: 2px solid #f7fafc; border-radius: 50%; color: #fff; background: #8db4d0; font-size: 9px; font-weight: 700; }
+      .avatar-stack span:nth-child(2) { background: #d78c6c; }
+      .avatar-stack span:nth-child(3) { background: #5aa891; }
+      .avatar-stack span:nth-child(4) { background: #677fba; }
+
+      .visual-stage { position: relative; min-height: 470px; display: grid; place-items: center; perspective: 1200px; }
+      .glow { position: absolute; width: 83%; height: 76%; border-radius: 50%; background: #8fd7ef; opacity: .16; filter: blur(65px); }
+      .dashboard {
+        position: relative; z-index: 1; width: min(100%, 590px); padding: 18px;
+        border: 1px solid rgb(206 220 234 / 90%); border-radius: 18px;
+        background: rgb(255 255 255 / 96%); box-shadow: 0 30px 80px rgb(39 71 104 / 17%), 0 3px 10px rgb(39 71 104 / 5%);
+        transform: rotateY(-7deg) rotateX(2deg); animation: dashboard-in 1s cubic-bezier(.16, 1, .3, 1) both, float 7s ease-in-out 1s infinite;
+      }
+      .dash-top { display: flex; align-items: center; justify-content: space-between; padding: 2px 2px 15px; }
+      .dash-title { display: flex; align-items: center; gap: 9px; font: 700 12px 'Plus Jakarta Sans', sans-serif; }
+      .dash-icon { width: 27px; height: 27px; display: grid; place-items: center; color: var(--blue); background: #e9f7fc; border-radius: 8px; font-size: 14px; }
+      .live-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 8px; border-radius: 999px; color: #087a5b; background: #e9f8f2; font-size: 9px; font-weight: 700; }
+      .live-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #13aa7b; animation: pulse 1.8s infinite; }
+      .dash-body { display: grid; grid-template-columns: 1.2fr .8fr; gap: 12px; }
+      .cooler-panel { min-height: 285px; padding: 12px; border-radius: 12px; background: #f2f6fa; }
+      .panel-head { display: flex; align-items: center; justify-content: space-between; color: #52657b; font-size: 9px; font-weight: 700; }
+      .store-label { color: #90a0b2; font-size: 8px; font-weight: 500; }
+      .cooler {
+        position: relative; margin-top: 11px; padding: 12px 9px 10px; overflow: hidden;
+        border: 1px solid #293d59; border-radius: 9px; background: linear-gradient(140deg, #182940, #101c2c);
+        box-shadow: inset 0 0 22px rgb(69 146 192 / 14%);
+      }
+      .cooler::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(110deg, transparent 30%, rgb(205 240 255 / 7%) 48%, transparent 62%); transform: translateX(-120%); animation: glass-glint 5s ease-in-out infinite; }
+      .cooler-row { position: relative; display: flex; justify-content: center; align-items: end; gap: 6px; height: 47px; }
+      .cooler-row + .cooler-row { margin-top: 10px; }
+      .can {
+        position: relative; width: 25px; height: 37px; flex: 0 0 25px; border-radius: 6px 6px 5px 5px;
+        background: linear-gradient(90deg, #d72e32, #ef494b 45%, #bb2229); box-shadow: inset 2px 0 3px rgb(255 255 255 / 20%), 0 2px 4px #07111e;
+        animation: can-rise .65s cubic-bezier(.16, 1, .3, 1) both;
+      }
+      .can::before { content: ''; position: absolute; left: 4px; right: 4px; top: -3px; height: 4px; border-radius: 3px; background: linear-gradient(#d7e1e9, #7d8b98); }
+      .can::after { content: ''; position: absolute; left: 3px; right: 3px; top: 14px; height: 9px; border-top: 1px solid rgb(255 255 255 / 46%); border-bottom: 1px solid rgb(255 255 255 / 36%); opacity: .8; }
+      .can.blue { height: 34px; background: linear-gradient(90deg, #1468ac, #2c96d4 45%, #155a9b); }
+      .can.green { height: 39px; background: linear-gradient(90deg, #168960, #30b87c 45%, #11714f); }
+      .can.orange { height: 33px; background: linear-gradient(90deg, #d26a16, #f49830 45%, #b85312); }
+      .can.silver { height: 38px; background: linear-gradient(90deg, #7e94a6, #d7e4ea 45%, #718495); }
+      .can.tall { height: 43px; width: 21px; flex-basis: 21px; border-radius: 7px 7px 6px 6px; }
+      .shelf { height: 4px; margin-top: 3px; border-top: 1px solid #8cc9df; border-radius: 4px; background: linear-gradient(#46647e, #1d3046); box-shadow: 0 5px 6px rgb(0 0 0 / 28%); }
+      .scan-line { position: absolute; z-index: 2; left: 4px; right: 4px; top: 18%; height: 2px; background: #63e3e7; box-shadow: 0 0 12px 3px rgb(56 221 231 / 70%); animation: scan 3.8s ease-in-out infinite; }
+      .cooler-bottom { margin-top: 10px; display: flex; align-items: center; justify-content: space-between; color: #9fb6c8; font-size: 8px; }
+      .cooler-bottom strong { color: #69e1b5; font-weight: 700; }
+      .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+      .stat { padding: 9px; border: 1px solid #e8eef4; border-radius: 9px; background: white; }
+      .stat-label { color: #8a9aad; font-size: 8px; }
+      .stat-value { margin-top: 5px; font: 700 16px 'Plus Jakarta Sans', sans-serif; letter-spacing: -.5px; }
+      .stat-change { margin-top: 2px; color: #0c9b73; font-size: 8px; font-weight: 700; }
+      .insight-card { min-height: 285px; padding: 12px; border: 1px solid #e9eef4; border-radius: 12px; background: white; }
+      .insight-title { color: #55687d; font-size: 9px; font-weight: 700; }
+      .insight-main { margin-top: 14px; padding: 10px; border: 1px solid #d9f0e8; border-radius: 9px; background: #f1fbf7; }
+      .insight-tag { color: #108060; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; }
+      .insight-headline { margin-top: 5px; color: #183b35; font: 700 10px/1.45 'Plus Jakarta Sans', sans-serif; }
+      .insight-copy { margin-top: 5px; color: #637d77; font-size: 8px; line-height: 1.5; }
+      .chart { height: 81px; margin-top: 13px; display: flex; align-items: end; gap: 7px; border-bottom: 1px solid #e7edf3; }
+      .chart span { flex: 1; height: var(--h); min-height: 9px; border-radius: 4px 4px 0 0; background: linear-gradient(180deg, #65c4e7, #1484bd); transform-origin: bottom; animation: bar-rise .85s cubic-bezier(.16, 1, .3, 1) both; animation-delay: var(--d); }
+      .chart span:nth-child(3n) { background: linear-gradient(180deg, #9fddcc, #24a77e); }
+      .chart-labels { display: flex; justify-content: space-between; margin-top: 5px; color: #96a4b4; font-size: 7px; }
+      .float-card {
+        position: absolute; z-index: 3; display: flex; align-items: center; gap: 10px;
+        padding: 11px 14px; border: 1px solid rgb(223 233 242 / 90%); border-radius: 12px;
+        background: rgb(255 255 255 / 96%); box-shadow: 0 14px 36px rgb(35 70 105 / 13%);
+        animation: float 5s ease-in-out infinite;
+      }
+      .float-card.alert { top: 20px; right: -15px; animation-delay: -1s; }
+      .float-card.score { left: -18px; bottom: 25px; animation-delay: -2.5s; }
+      .float-icon { width: 31px; height: 31px; display: grid; place-items: center; border-radius: 9px; background: #fff5e8; font-size: 15px; }
+      .score .float-icon { background: #eaf8f2; }
+      .float-text strong { display: block; font-size: 10px; }
+      .float-text span { display: block; margin-top: 3px; color: #8493a4; font-size: 8px; }
+
+      .trust { padding: 23px 0 24px; border-top: 1px solid #e6edf4; border-bottom: 1px solid #e6edf4; background: white; }
+      .trust-inner { display: flex; align-items: center; justify-content: space-between; gap: 22px; }
+      .trust-label { color: #8897a8; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+      .trust-items { display: flex; align-items: center; gap: clamp(18px, 4vw, 52px); color: #64768a; font: 700 12px 'Plus Jakarta Sans', sans-serif; }
+      .trust-items span { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+      .trust-items b { color: #8bb9cf; font-size: 17px; }
+
+      .section { padding: 94px 0; }
+      .section-heading { max-width: 620px; margin: 0 auto 44px; text-align: center; }
+      .section-heading .eyebrow { margin-bottom: 15px; }
+      h2 { margin: 0; font-size: clamp(30px, 3.8vw, 43px); letter-spacing: -1.7px; line-height: 1.15; }
+      .section-heading p { max-width: 520px; margin: 14px auto 0; color: var(--muted); font-size: 14px; line-height: 1.75; }
+      .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+      .feature-card {
+        position: relative; min-height: 245px; padding: 25px; overflow: hidden;
+        border: 1px solid #e3ebf3; border-radius: 16px; background: white;
+        box-shadow: 0 4px 18px rgb(31 65 96 / 3%); transition: transform .25s, box-shadow .25s;
+      }
+      .feature-card:hover { transform: translateY(-5px); box-shadow: 0 18px 34px rgb(31 65 96 / 9%); }
+      .feature-icon { width: 42px; height: 42px; display: grid; place-items: center; margin-bottom: 20px; border-radius: 12px; color: #087db8; background: #eaf7fc; }
+      .feature-icon svg { width: 20px; height: 20px; }
+      .feature-card:nth-child(2) .feature-icon { color: #108460; background: #eaf8f2; }
+      .feature-card:nth-child(3) .feature-icon { color: #af6b0d; background: #fff5e7; }
+      .feature-card h3 { margin: 0 0 9px; font-size: 16px; letter-spacing: -.4px; }
+      .feature-card p { margin: 0; color: #6b7b8f; font-size: 12px; line-height: 1.7; }
+      .feature-number { position: absolute; right: 18px; bottom: -16px; color: #f3f7fa; font: 800 82px 'Plus Jakarta Sans', sans-serif; }
+
+      .story { padding: 66px 0; color: white; background: #10243b; }
+      .story-inner { display: grid; grid-template-columns: .8fr 1.2fr; align-items: center; gap: 72px; }
+      .story .eyebrow { color: #9be4e9; border-color: rgb(129 222 229 / 20%); background: rgb(129 222 229 / 9%); }
+      .story h2 { max-width: 440px; margin-top: 18px; }
+      .story-copy { max-width: 420px; margin: 16px 0 25px; color: #b6c8d8; font-size: 13px; line-height: 1.8; }
+      .story .button { color: #10243b; background: white; box-shadow: none; }
+      .story .button:hover { background: #e9f7fc; }
+      .workflow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+      .step { position: relative; min-height: 165px; padding: 20px 16px; border: 1px solid rgb(209 231 246 / 15%); border-radius: 13px; background: rgb(255 255 255 / 5%); }
+      .step-no { color: #72d2de; font: 700 10px 'Plus Jakarta Sans', sans-serif; letter-spacing: .08em; }
+      .step-icon { display: block; margin: 16px 0 10px; font-size: 20px; }
+      .step strong { display: block; font: 700 12px 'Plus Jakarta Sans', sans-serif; }
+      .step p { margin: 7px 0 0; color: #a4b7c8; font-size: 10px; line-height: 1.55; }
+
+      .closing { padding: 83px 0; text-align: center; background: linear-gradient(180deg, #f7fbfe, #edf5fa); }
+      .closing p { max-width: 500px; margin: 13px auto 23px; color: #66788d; font-size: 14px; line-height: 1.7; }
+      .closing-actions { display: flex; justify-content: center; gap: 11px; flex-wrap: wrap; }
+      footer { padding: 23px 0; color: #8190a1; background: white; border-top: 1px solid #e7edf3; font-size: 10px; }
+      .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+      .footer-brand { display: flex; align-items: center; gap: 8px; color: #33475e; font-weight: 700; }
+      .footer-brand .brand-mark { width: 24px; height: 24px; border-radius: 7px; }
+      .footer-brand .brand-mark svg { width: 16px; height: 16px; }
+      .reveal { opacity: 0; transform: translateY(18px); transition: opacity .65s ease, transform .65s cubic-bezier(.16, 1, .3, 1); }
+      .reveal.visible { opacity: 1; transform: translateY(0); }
+      .mobile-menu { display: none; position: relative; }
+      .mobile-menu summary {
+        min-height: 39px; display: inline-flex; align-items: center; gap: 6px;
+        padding: 0 10px; border: 1px solid var(--line); border-radius: 9px;
+        background: white; color: var(--ink); cursor: pointer; font-size: 11px; font-weight: 700;
+        list-style: none;
+      }
+      .mobile-menu summary::-webkit-details-marker { display: none; }
+      .mobile-menu[open] summary { color: var(--blue); border-color: #b7ddec; }
+      .mobile-menu-panel {
+        position: absolute; top: calc(100% + 8px); right: 0; z-index: 22;
+        width: min(220px, calc(100vw - 32px)); padding: 6px;
+        border: 1px solid var(--line); border-radius: 12px; background: white;
+        box-shadow: 0 14px 32px rgb(16 35 61 / 14%);
+      }
+      .mobile-menu-panel a {
+        display: block; padding: 11px 12px; border-radius: 8px;
+        color: #53647a; font-size: 12px; font-weight: 600;
+      }
+      .mobile-menu-panel a:hover, .mobile-menu-panel a:focus-visible {
+        color: var(--blue); background: #f2f8fc; outline: none;
+      }
+      .nav-cta-compact { display: none; }
+
+      @keyframes drift { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-13px); } }
+      @keyframes float { 0%,100% { translate: 0 0; } 50% { translate: 0 -9px; } }
+      @keyframes dashboard-in { from { opacity: 0; transform: translate(20px, 15px) rotateY(-12deg) scale(.96); } to { opacity: 1; transform: rotateY(-7deg) rotateX(2deg) scale(1); } }
+      @keyframes can-rise { from { opacity: 0; transform: translateY(14px) scale(.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+      @keyframes scan { 0%,100% { top: 16%; opacity: .65; } 50% { top: 84%; opacity: 1; } }
+      @keyframes glass-glint { 0%,35% { transform: translateX(-120%); } 72%,100% { transform: translateX(120%); } }
+      @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgb(19 170 123 / 35%); } 50% { box-shadow: 0 0 0 5px rgb(19 170 123 / 0%); } }
+      @keyframes bar-rise { from { transform: scaleY(.1); opacity: .3; } to { transform: scaleY(1); opacity: 1; } }
+
+      @media (max-width: 900px) {
+        .hero { padding: 65px 0 55px; }
+        .hero-grid { grid-template-columns: 1fr; gap: 26px; }
+        .hero-copy { max-width: 560px; }
+        .visual-stage { min-height: 430px; }
+        .dashboard { transform: none; animation: dashboard-in-mobile .8s cubic-bezier(.16, 1, .3, 1) both, float 7s ease-in-out .8s infinite; }
+        .float-card.alert { right: 0; }
+        .float-card.score { left: 0; }
+        .story-inner { grid-template-columns: 1fr; gap: 30px; }
+        .story h2 { max-width: 620px; }
+      }
+      @keyframes dashboard-in-mobile { from { opacity: 0; transform: translateY(15px) scale(.97); } to { opacity: 1; transform: scale(1); } }
+      @media (max-width: 620px) {
+        .wrap { width: min(100% - 32px, 500px); }
+        .topbar { height: 64px; }
+        .nav-links { display: none; }
+        .mobile-menu { display: block; }
+        .nav-cta { min-height: 39px; padding: 0 9px; font-size: 10px; }
+        .nav-cta-full { display: none; }
+        .nav-cta-compact { display: inline; }
+        .hero { padding: 52px 0 42px; }
+        h1 { font-size: clamp(42px, 11vw, 56px); letter-spacing: -2.4px; }
+        .hero-copy { font-size: 14px; }
+        .visual-stage { min-height: 370px; margin: 2px -6px 0; }
+        .dashboard { padding: 12px; border-radius: 14px; }
+        .cooler-panel, .insight-card { min-height: 248px; padding: 9px; }
+        .cooler-row { height: 39px; gap: 4px; }
+        .can { width: 19px; flex-basis: 19px; height: 32px; }
+        .can.tall { width: 17px; flex-basis: 17px; height: 37px; }
+        .can.blue { height: 30px; } .can.green { height: 33px; } .can.orange { height: 28px; } .can.silver { height: 33px; }
+        .stat { padding: 7px; } .stat-value { font-size: 14px; }
+        .float-card { padding: 8px 10px; }
+        .float-card.alert { top: -12px; right: 0; }
+        .float-card.score { left: -2px; bottom: -14px; }
+        .trust-inner { flex-direction: column; align-items: flex-start; }
+        .trust-items { width: 100%; justify-content: space-between; gap: 12px; font-size: 10px; }
+        .trust-items span { gap: 4px; }
+        .section { padding: 68px 0; }
+        .section-heading { margin-bottom: 28px; }
+        .feature-grid { grid-template-columns: 1fr; gap: 11px; }
+        .feature-card { min-height: 195px; padding: 20px; }
+        .feature-number { font-size: 65px; }
+        .story { padding: 58px 0; }
+        .workflow { grid-template-columns: 1fr; }
+        .step { min-height: auto; display: grid; grid-template-columns: 35px 30px 1fr; align-items: center; column-gap: 8px; padding: 14px; }
+        .step-no { grid-row: span 2; }
+        .step-icon { margin: 0; }
+        .step strong { align-self: end; }
+        .step p { grid-column: 3; margin-top: 3px; }
+        .closing { padding: 64px 0; }
+        .footer-inner { flex-direction: column; align-items: flex-start; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+        .reveal { opacity: 1; transform: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="topbar">
+        <nav class="nav wrap" aria-label="Main navigation">
+          <a class="brand" href="#home" aria-label="KoolerIQ home">
+            <span class="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M7 3.8h10v16.4H7zM9.5 7h5M9.5 10.5h5M9.5 14h5M9.5 17.5h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 8v8M19 8v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </span>
+            KoolerIQ
+          </a>
+          <div class="nav-links">
+            <a href="#platform">Platform</a>
+            <a href="#how-it-works">How it works</a>
+          </div>
+          <details class="mobile-menu">
+            <summary>Menu <span aria-hidden="true">⌄</span></summary>
+            <div class="mobile-menu-panel">
+              <a href="#platform">Platform</a>
+              <a href="#how-it-works">How it works</a>
+            </div>
+          </details>
+          <a class="nav-cta" href="/kooleriq-prototype.html">
+            <span class="nav-cta-full">Explore the live demo</span>
+            <span class="nav-cta-compact">Try demo</span>
+            <span aria-hidden="true">→</span>
+          </a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="hero" id="home">
+          <div class="wrap hero-grid">
+            <div class="hero-content">
+              <span class="eyebrow"><span class="eyebrow-dot"></span> A smarter view of every cooler</span>
+              <h1>Every cooler.<br />A <span class="gradient-text">clearer picture.</span></h1>
+              <p class="hero-copy">
+                Turn cooler checks into confident decisions. See shelf gaps, spot what’s moving, and give every store a smarter planogram.
+              </p>
+              <div class="hero-actions">
+                <a class="button" href="/kooleriq-prototype.html">See KoolerIQ in action
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+                <a class="button secondary" href="#platform">Discover the platform</a>
+              </div>
+              <div class="hero-proof">
+                <div class="avatar-stack" aria-hidden="true"><span>R</span><span>M</span><span>A</span><span>J</span></div>
+                <span>Built for the people who keep every shelf moving</span>
+              </div>
+            </div>
+
+            <div class="visual-stage" aria-label="Animated preview of cooler analytics">
+              <div class="glow"></div>
+              <div class="dashboard">
+                <div class="dash-top">
+                  <div class="dash-title"><span class="dash-icon">▦</span> Cooler performance <span class="store-label">· Store 04</span></div>
+                  <span class="live-pill">LIVE VIEW</span>
+                </div>
+                <div class="dash-body">
+                  <div class="cooler-panel">
+                    <div class="panel-head"><span>Front cooler · 4 doors</span><span class="store-label">JUST NOW</span></div>
+                    <div class="cooler">
+                      <div class="scan-line"></div>
+                      <div class="cooler-row">
+                        <i class="can" style="animation-delay:.10s"></i><i class="can blue" style="animation-delay:.17s"></i><i class="can green" style="animation-delay:.24s"></i><i class="can orange" style="animation-delay:.31s"></i><i class="can silver" style="animation-delay:.38s"></i><i class="can blue tall" style="animation-delay:.45s"></i><i class="can" style="animation-delay:.52s"></i><i class="can green" style="animation-delay:.59s"></i>
+                      </div><div class="shelf"></div>
+                      <div class="cooler-row">
+                        <i class="can green" style="animation-delay:.20s"></i><i class="can orange" style="animation-delay:.27s"></i><i class="can silver tall" style="animation-delay:.34s"></i><i class="can blue" style="animation-delay:.41s"></i><i class="can" style="animation-delay:.48s"></i><i class="can green" style="animation-delay:.55s"></i><i class="can orange" style="animation-delay:.62s"></i><i class="can silver" style="animation-delay:.69s"></i>
+                      </div><div class="shelf"></div>
+                      <div class="cooler-row">
+                        <i class="can blue" style="animation-delay:.30s"></i><i class="can" style="animation-delay:.37s"></i><i class="can green tall" style="animation-delay:.44s"></i><i class="can orange" style="animation-delay:.51s"></i><i class="can silver" style="animation-delay:.58s"></i><i class="can blue" style="animation-delay:.65s"></i><i class="can" style="animation-delay:.72s"></i><i class="can green" style="animation-delay:.79s"></i>
+                      </div><div class="shelf"></div>
+                      <div class="cooler-bottom"><span>Facing compliance</span><strong>94% · On track</strong></div>
+                    </div>
+                    <div class="stat-grid">
+                      <div class="stat"><div class="stat-label">SHELF AVAILABILITY</div><div class="stat-value">96.8%</div><div class="stat-change">↑ 4.2% this week</div></div>
+                      <div class="stat"><div class="stat-label">OPPORTUNITIES</div><div class="stat-value">03</div><div class="stat-change" style="color:#bd7411">2 need attention</div></div>
+                    </div>
+                  </div>
+                  <div class="insight-card">
+                    <div class="insight-title">A useful next move</div>
+                    <div class="insight-main"><div class="insight-tag">Shelf insight</div><div class="insight-headline">Give the best sellers one more facing.</div><div class="insight-copy">Top-performing items are running low on eye-level space.</div></div>
+                    <div class="chart" aria-label="Animated weekly sales chart">
+                      <span style="--h:35%;--d:.10s"></span><span style="--h:52%;--d:.18s"></span><span style="--h:43%;--d:.26s"></span><span style="--h:70%;--d:.34s"></span><span style="--h:57%;--d:.42s"></span><span style="--h:86%;--d:.50s"></span><span style="--h:74%;--d:.58s"></span><span style="--h:100%;--d:.66s"></span>
+                    </div><div class="chart-labels"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div>
+                    <div class="stat" style="margin-top:12px"><div class="stat-label">WEEKLY SALES TREND</div><div class="stat-value" style="font-size:14px">+12.4%</div><div class="stat-change">vs. previous week</div></div>
+                  </div>
+                </div>
+              </div>
+              <div class="float-card alert"><div class="float-icon">✦</div><div class="float-text"><strong>AI shelf check complete</strong><span>3 quick wins found · just now</span></div></div>
+              <div class="float-card score"><div class="float-icon">↗</div><div class="float-text"><strong>More shelf, less guesswork</strong><span>One clear view for your whole team</span></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="trust" aria-label="Platform capabilities">
+          <div class="wrap trust-inner">
+            <span class="trust-label">One platform for the whole cooler</span>
+            <div class="trust-items"><span><b>⌕</b> See the shelf</span><span><b>◈</b> Find the gap</span><span><b>↗</b> Make the move</span></div>
+          </div>
+        </section>
+
+        <section class="section" id="platform">
+          <div class="wrap">
+            <div class="section-heading reveal">
+              <span class="eyebrow">From cooler check to clear action</span>
+              <h2>Make every shelf visit count.</h2>
+              <p>Bring your cooler operation into focus with practical tools for day-to-day execution and better merchandising decisions.</p>
+            </div>
+            <div class="feature-grid">
+              <article class="feature-card reveal">
+                <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16v14H4zM8 9h8M8 12h8M8 15h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="m16 16 2 2 4-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <h3>Know what’s on the shelf</h3>
+                <p>Keep store layouts, products, and cooler checks together so your team starts with the same clear picture.</p>
+                <span class="feature-number">01</span>
+              </article>
+              <article class="feature-card reveal">
+                <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 18V6m0 12h17M8 15l3-4 3 2 5-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 6h3v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <h3>Spot the next opportunity</h3>
+                <p>Surface out-of-stock risks, shelf gaps, and sales patterns before they turn into missed opportunities.</p>
+                <span class="feature-number">02</span>
+              </article>
+              <article class="feature-card reveal">
+                <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18m0-18 4 4m-4-4L8 7m4 14 4-4m-4 4-4-4M4 12h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <h3>Turn insight into action</h3>
+                <p>Give operators a straightforward next step, from replenishment priorities to planogram adjustments.</p>
+                <span class="feature-number">03</span>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="story" id="how-it-works">
+          <div class="wrap story-inner">
+            <div class="reveal">
+              <span class="eyebrow">Made for the real world</span>
+              <h2>Less time piecing it together. More time getting it right.</h2>
+              <p class="story-copy">KoolerIQ brings your cooler layouts, shelf execution, and store-level signals into one practical workflow your team can use on the go.</p>
+              <a class="button" href="/kooleriq-prototype.html">Try the interactive prototype <span aria-hidden="true">→</span></a>
+            </div>
+            <div class="workflow reveal">
+              <div class="step"><span class="step-no">01 / SEE</span><span class="step-icon">▤</span><strong>Get the full view</strong><p>Bring store coolers and shelf layouts into focus.</p></div>
+              <div class="step"><span class="step-no">02 / SPOT</span><span class="step-icon">⌕</span><strong>Catch what changed</strong><p>See gaps and patterns that deserve attention.</p></div>
+              <div class="step"><span class="step-no">03 / ACT</span><span class="step-icon">↗</span><strong>Make the next move</strong><p>Help your team prioritize with confidence.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="closing">
+          <div class="wrap reveal">
+            <span class="eyebrow">Your next cooler check, made clearer</span>
+            <h2>See KoolerIQ in action.</h2>
+            <p>Explore a hands-on product preview and see how a clearer view of your cooler can change the way your team works.</p>
+            <div class="closing-actions">
+              <a class="button" href="/kooleriq-prototype.html">Launch the interactive demo <span aria-hidden="true">→</span></a>
+              <a class="button secondary" href="mailto:hello@kooleriq.com?subject=KoolerIQ%20demo">Talk to our team</a>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <div class="wrap footer-inner">
+          <a class="footer-brand" href="#home"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M7 3.8h10v16.4H7zM9.5 7h5M9.5 10.5h5M9.5 14h5M9.5 17.5h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>KoolerIQ</a>
+          <span>Clearer cooler operations start here.</span>
+          <span>© <span id="year"></span> KoolerIQ</span>
+        </div>
+      </footer>
+    </div>
+    <script>
+      document.getElementById('year').textContent = new Date().getFullYear();
+      document.querySelectorAll('.mobile-menu-panel a').forEach((link) => {
+        link.addEventListener('click', () => {
+          const menu = link.closest('.mobile-menu');
+          if (menu) menu.open = false;
+        });
+      });
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      document.querySelectorAll('.reveal').forEach((element) => revealObserver.observe(element));
+    </script>
+  </body>
+</html>

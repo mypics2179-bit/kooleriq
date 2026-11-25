@@ -1,0 +1,1592 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KoolerIQ — Interactive Animated Single-File Prototype</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f3f6fa;
+        --surface: #ffffff;
+        --surface-muted: #eaf0f6;
+        --surface-elevated: #e1e9f3;
+        --header: rgba(255, 255, 255, 0.92);
+        --cabinet: #0f172a;
+        --cabinet-slot: #172338;
+        --text: #0f172a;
+        --text-2: #475569;
+        --text-3: #64748b;
+        --accent: #0284c7;
+        --accent-hover: #0369a1;
+        --accent-fg: #ffffff;
+        --accent-soft: rgba(2, 132, 199, 0.1);
+        --accent-border: rgba(2, 132, 199, 0.35);
+        --emerald: #059669;
+        --emerald-soft: rgba(5, 150, 105, 0.12);
+        --emerald-text: #065f46;
+        --amber: #d97706;
+        --amber-soft: rgba(217, 119, 6, 0.12);
+        --amber-text: #92400e;
+        --crimson: #dc2626;
+        --crimson-soft: rgba(220, 38, 38, 0.1);
+        --crimson-text: #991b1b;
+        --border: rgba(15, 23, 42, 0.1);
+        --border-strong: rgba(15, 23, 42, 0.18);
+        --shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 6px 20px rgba(15, 23, 42, 0.05);
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      html.dark {
+        --bg: #0b1018;
+        --surface: #131a24;
+        --surface-muted: #0e141d;
+        --surface-elevated: #1b2433;
+        --header: rgba(11, 16, 24, 0.92);
+        --cabinet: #080c14;
+        --cabinet-slot: #141d2b;
+        --text: #f1f5f9;
+        --text-2: #94a3b8;
+        --text-3: #64748b;
+        --accent: #38bdf8;
+        --accent-hover: #7dd3fc;
+        --accent-fg: #082f49;
+        --accent-soft: rgba(56, 189, 248, 0.14);
+        --accent-border: rgba(56, 189, 248, 0.42);
+        --emerald: #10b981;
+        --emerald-soft: rgba(16, 185, 129, 0.15);
+        --emerald-text: #a7f3d0;
+        --amber: #f59e0b;
+        --amber-soft: rgba(245, 158, 11, 0.15);
+        --amber-text: #fde68a;
+        --crimson: #ef4444;
+        --crimson-soft: rgba(239, 68, 68, 0.15);
+        --crimson-text: #fecaca;
+        --border: rgba(255, 255, 255, 0.1);
+        --border-strong: rgba(255, 255, 255, 0.18);
+        --shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        min-height: 100vh;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      .font-display {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        margin: 0;
+      }
+
+      .mono {
+        font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+        font-variant-numeric: tabular-nums;
+      }
+
+      button {
+        font-family: inherit;
+        cursor: pointer;
+      }
+
+      button:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      /* 3-Zone Top Header */
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        height: 62px;
+        background: var(--header);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .topbar-inner {
+        max-width: 1280px;
+        height: 100%;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 32px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--text);
+        white-space: nowrap;
+        flex-shrink: 0;
+        background: transparent;
+        border: none;
+        padding: 0;
+      }
+
+      .brand-mark {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: var(--accent);
+        color: var(--accent-fg);
+        display: grid;
+        place-items: center;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.28);
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        overflow-x: auto;
+      }
+
+      .nav-btn {
+        position: relative;
+        background: transparent;
+        border: none;
+        color: var(--text-2);
+        font-size: 13.5px;
+        font-weight: 500;
+        padding: 10px 4px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        transition: color 180ms var(--ease);
+      }
+
+      .nav-btn:hover {
+        color: var(--text);
+      }
+
+      .nav-btn.active {
+        color: var(--accent);
+        font-weight: 700;
+      }
+
+      .nav-btn.active::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 2px;
+        border-radius: 999px;
+        background: var(--accent);
+        transform-origin: center;
+        animation: barGrow 260ms var(--ease) forwards;
+      }
+
+      .nav-btn.center-scan {
+        min-height: 40px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--accent-border);
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+      }
+
+      .nav-btn.center-scan.active {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: var(--accent-fg);
+      }
+
+      .nav-btn.center-scan.active::after {
+        display: none;
+      }
+
+      .btn-primary {
+        min-height: 40px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: none;
+        background: var(--accent);
+        color: var(--accent-fg);
+        font-size: 12.5px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        transition: transform 140ms var(--ease), background 160ms var(--ease);
+      }
+
+      .btn-primary:hover {
+        background: var(--accent-hover);
+      }
+
+      .btn-primary:active {
+        transform: scale(0.97);
+      }
+
+      .btn-secondary {
+        min-height: 40px;
+        padding: 8px 14px;
+        border-radius: 8px;
+        border: 1px solid var(--border-strong);
+        background: var(--surface);
+        color: var(--text);
+        font-size: 12.5px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        transition: border-color 160ms var(--ease), transform 140ms var(--ease);
+      }
+
+      .btn-secondary:hover {
+        border-color: var(--accent);
+      }
+
+      .btn-secondary:active {
+        transform: scale(0.97);
+      }
+
+      /* Container & Sub-Toolbar */
+      .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 20px 20px 84px;
+      }
+
+      .subbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding-bottom: 16px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .meta-line {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--text-3);
+        margin-top: 5px;
+      }
+
+      .toolbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      /* Card & Grid Primitives (Single Elevation) */
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        box-shadow: var(--shadow);
+      }
+
+      .kpi-strip {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .kpi-card {
+        padding: 16px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        opacity: 0;
+        transform: translateY(10px);
+        animation: riseIn 420ms var(--ease) forwards;
+      }
+
+      .kpi-card:nth-child(2) {
+        animation-delay: 55ms;
+      }
+      .kpi-card:nth-child(3) {
+        animation-delay: 110ms;
+      }
+      .kpi-card:nth-child(4) {
+        animation-delay: 165ms;
+      }
+
+      .kpi-label {
+        font-size: 12px;
+        color: var(--text-3);
+        font-weight: 500;
+      }
+
+      .kpi-val {
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--text);
+      }
+
+      .kpi-sub {
+        font-size: 11.5px;
+        color: var(--text-2);
+      }
+
+      /* View Transition */
+      .view-stage {
+        animation: panelEnter 340ms var(--ease);
+      }
+
+      /* Dashboard Split */
+      .dash-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+        gap: 18px;
+        align-items: start;
+      }
+
+      .door-tabs {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px;
+        background: var(--surface-muted);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+
+      .door-tab {
+        min-height: 36px;
+        padding: 6px 12px;
+        border-radius: 7px;
+        border: none;
+        background: transparent;
+        color: var(--text-2);
+        font-size: 12px;
+        font-weight: 600;
+        transition: background 160ms var(--ease), color 160ms var(--ease);
+      }
+
+      .door-tab.active {
+        background: var(--surface);
+        color: var(--accent);
+        box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+      }
+
+      /* Animated Cooler Cabinet */
+      .cabinet {
+        background: var(--cabinet);
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-radius: 14px;
+        padding: 16px;
+        color: #f8fafc;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .cabinet::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          115deg,
+          rgba(56, 189, 248, 0.08) 0%,
+          transparent 38%,
+          rgba(255, 255, 255, 0.04) 52%,
+          transparent 65%
+        );
+        pointer-events: none;
+        transform: translateX(-100%);
+        animation: glassSheen 7.5s ease-in-out infinite;
+      }
+
+      .shelf-row {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        padding-bottom: 12px;
+        margin-bottom: 12px;
+        border-bottom: 2px solid rgba(186, 230, 253, 0.2);
+      }
+
+      .shelf-row:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+
+      .slot-tile {
+        background: var(--cabinet-slot);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 10px;
+        padding: 10px;
+        text-align: left;
+        color: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        position: relative;
+        transition: transform 180ms var(--ease), border-color 180ms var(--ease);
+        animation: slotPop 360ms var(--ease) backwards;
+      }
+
+      .slot-tile:hover {
+        transform: translateY(-2px);
+        border-color: rgba(56, 189, 248, 0.7);
+      }
+
+      .slot-tile.selected {
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.3);
+      }
+
+      .slot-tile.oos {
+        border-color: rgba(239, 68, 68, 0.65);
+        background: rgba(127, 29, 29, 0.28);
+      }
+
+      .slot-tile.low {
+        border-color: rgba(245, 158, 11, 0.55);
+      }
+
+      .slot-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 10.5px;
+        color: #94a3b8;
+      }
+
+      .slot-sku {
+        font-size: 12.5px;
+        font-weight: 700;
+        line-height: 1.25;
+        color: #f8fafc;
+      }
+
+      .depth-track {
+        height: 6px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+      }
+
+      .depth-fill {
+        height: 100%;
+        border-radius: 999px;
+        transform-origin: left center;
+        transition: transform 420ms var(--ease), background-color 260ms ease;
+      }
+
+      .status-text {
+        font-size: 10.5px;
+        font-weight: 600;
+      }
+
+      .st-ok {
+        color: #34d399;
+      }
+      .st-low {
+        color: #fbbf24;
+      }
+      .st-oos {
+        color: #f87171;
+      }
+
+      /* Gauge Ring & Telemetry Chart */
+      .ring-wrap {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .ring-svg circle.progress {
+        transition: stroke-dashoffset 600ms var(--ease);
+      }
+
+      .wave-path {
+        stroke-dasharray: 420;
+        stroke-dashoffset: 420;
+        animation: drawStroke 1.2s var(--ease) forwards;
+      }
+
+      /* Optical Scan Hub */
+      .scan-viewport {
+        background: #070c14;
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        border-radius: 14px;
+        height: 360px;
+        position: relative;
+        overflow: hidden;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .laser-beam {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #38bdf8, #34d399, #38bdf8, transparent);
+        box-shadow: 0 0 18px rgba(56, 189, 248, 0.9);
+        animation: laserSweep 2.4s var(--ease) infinite;
+        pointer-events: none;
+      }
+
+      .reticle {
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        border-color: rgba(56, 189, 248, 0.8);
+        border-style: solid;
+        pointer-events: none;
+      }
+      .reticle.tl { top: 14px; left: 14px; border-width: 2px 0 0 2px; border-radius: 4px 0 0 0; }
+      .reticle.tr { top: 14px; right: 14px; border-width: 2px 2px 0 0; border-radius: 0 4px 0 0; }
+      .reticle.bl { bottom: 14px; left: 14px; border-width: 0 0 2px 2px; border-radius: 0 0 0 4px; }
+      .reticle.br { bottom: 14px; right: 14px; border-width: 0 2px 2px 0; border-radius: 0 0 4px 0; }
+
+      .scan-boxes {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin: auto 0;
+      }
+
+      .scan-box {
+        border: 1px dashed rgba(56, 189, 248, 0.55);
+        background: rgba(15, 23, 42, 0.72);
+        border-radius: 10px;
+        padding: 12px;
+        color: #f8fafc;
+        transition: transform 240ms var(--ease), border-color 240ms ease;
+      }
+
+      .scan-box.highlight {
+        border-style: solid;
+        border-color: #34d399;
+        transform: scale(1.03);
+      }
+
+      /* Tables & Lists */
+      .table-wrap {
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+
+      th,
+      td {
+        padding: 11px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+
+      th {
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--text-3);
+      }
+
+      td.num,
+      th.num {
+        text-align: right;
+      }
+
+      tr:hover td {
+        background: var(--surface-muted);
+      }
+
+      /* Toast */
+      .toast {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 50;
+        background: var(--surface);
+        border: 1px solid var(--accent-border);
+        color: var(--text);
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 12.5px;
+        font-weight: 600;
+        box-shadow: 0 14px 36px rgba(15, 23, 42, 0.22);
+        opacity: 0;
+        transform: translateY(12px);
+        pointer-events: none;
+        transition: opacity 200ms var(--ease), transform 220ms var(--ease);
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Progress bar for Auto-Tour */
+      .tour-bar-track {
+        height: 3px;
+        background: var(--border);
+        border-radius: 999px;
+        overflow: hidden;
+        margin-top: 8px;
+      }
+
+      .tour-bar-fill {
+        height: 100%;
+        background: var(--accent);
+        transform-origin: left center;
+        transform: scaleX(0);
+      }
+
+      .tour-bar-fill.running {
+        animation: tourProgress 4.5s linear infinite;
+      }
+
+      @keyframes riseIn {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes panelEnter {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slotPop {
+        from {
+          opacity: 0;
+          transform: translateY(6px) scale(0.98);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes barGrow {
+        from {
+          transform: scaleX(0.2);
+        }
+        to {
+          transform: scaleX(1);
+        }
+      }
+
+      @keyframes glassSheen {
+        0%,
+        65% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(180%);
+        }
+      }
+
+      @keyframes laserSweep {
+        0% {
+          transform: translateY(16px);
+          opacity: 0.9;
+        }
+        50% {
+          transform: translateY(336px);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(16px);
+          opacity: 0.9;
+        }
+      }
+
+      @keyframes drawStroke {
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      @keyframes tourProgress {
+        from {
+          transform: scaleX(0);
+        }
+        to {
+          transform: scaleX(1);
+        }
+      }
+
+      @media (max-width: 960px) {
+        .kpi-strip {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .dash-grid {
+          grid-template-columns: 1fr;
+        }
+        .scan-boxes {
+          grid-template-columns: 1fr;
+        }
+        .scan-viewport {
+          height: auto;
+          min-height: 360px;
+          gap: 16px;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .shelf-row {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .topbar-inner {
+          gap: 12px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <button class="brand" type="button" id="brandBtn" aria-label="KoolerIQ Home">
+          <span class="brand-mark" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+              <rect x="4" y="2" width="16" height="20" rx="2" />
+              <line x1="15" y1="9" x2="15" y2="15" />
+            </svg>
+          </span>
+          <span>KoolerIQ</span>
+        </button>
+
+        <nav class="nav-links" aria-label="Prototype Navigation">
+          <button class="nav-btn active" type="button" data-tab="dashboard">Dashboard</button>
+          <button class="nav-btn" type="button" data-tab="inventory">Inventory</button>
+          <button class="nav-btn center-scan" type="button" data-tab="scan">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+              <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+              <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+              <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+              <line x1="7" y1="12" x2="17" y2="12" />
+            </svg>
+            Scan
+          </button>
+          <button class="nav-btn" type="button" data-tab="orders">Orders</button>
+          <button class="nav-btn" type="button" data-tab="reports">Reports</button>
+        </nav>
+
+        <button class="btn-primary" type="button" id="tourBtn">
+          <span id="tourBtnLabel">Pause Auto-Tour</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="subbar">
+        <div>
+          <h1 class="font-display" style="font-size: 22px; font-weight: 700;" id="viewTitle">
+            Cooler Planogram Dashboard
+          </h1>
+          <div class="meta-line">
+            <span>Interactive Single-File Prototype</span>
+            <span aria-hidden="true">·</span>
+            <span class="mono" id="storeMeta">Apex C-Store #04 · 4 Cooler Doors</span>
+            <span aria-hidden="true">·</span>
+            <span>www.kooleriq.com</span>
+          </div>
+          <div class="tour-bar-track" aria-hidden="true">
+            <div class="tour-bar-fill running" id="tourProgressBar"></div>
+          </div>
+        </div>
+
+        <div class="toolbar-actions">
+          <button class="btn-secondary" type="button" id="themeToggleBtn">Switch to Dark Mode</button>
+          <button class="btn-secondary" type="button" id="resetProtoBtn">Reset Simulation</button>
+        </div>
+      </div>
+
+      <section class="kpi-strip" aria-label="Live Store Telemetry Metrics">
+        <div class="card kpi-card">
+          <span class="kpi-label">Planogram Compliance</span>
+          <span class="kpi-val mono" id="kpiCompliance">87.5%</span>
+          <span class="kpi-sub" id="kpiComplianceSub">21 / 24 facings aligned</span>
+        </div>
+        <div class="card kpi-card">
+          <span class="kpi-label">Out-of-Stock Gaps</span>
+          <span class="kpi-val mono" id="kpiOos">3</span>
+          <span class="kpi-sub" id="kpiOosSub">Walk-in pull queued</span>
+        </div>
+        <div class="card kpi-card">
+          <span class="kpi-label">Cold-Chain Temperature</span>
+          <span class="kpi-val mono" id="kpiTemp">36.4°F</span>
+          <span class="kpi-sub">Target band 34.0–38.0°F</span>
+        </div>
+        <div class="card kpi-card">
+          <span class="kpi-label">Projected Weekly Lift</span>
+          <span class="kpi-val mono" id="kpiLift" style="color: var(--emerald);">+$342</span>
+          <span class="kpi-sub">AI eye-level optimization</span>
+        </div>
+      </section>
+
+      <section id="stage" class="view-stage" aria-live="polite"></section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script>
+      (function () {
+        const TABS = ['dashboard', 'inventory', 'scan', 'orders', 'reports'];
+        const TAB_TITLES = {
+          dashboard: 'Cooler Planogram Dashboard',
+          inventory: 'Walk-In & Distributor Inventory',
+          scan: 'Optical Shelf & Barcode Scan Hub',
+          orders: 'Distributor Orders & Replenishment',
+          reports: 'AI Merchandising Lift & Shelf Audits',
+        };
+
+        const INITIAL_DOORS = [
+          {
+            id: 'd1',
+            number: '01',
+            label: 'Door 01 · Energy & Performance',
+            tempF: 36.2,
+            humidity: 44,
+            slots: [
+              { id: 's1', coord: 'S1-F01', sku: 'Celsius Peach Vibe', price: 3.29, depth: 6, max: 6, margin: 44 },
+              { id: 's2', coord: 'S1-F02', sku: 'Celsius Arctic Berry', price: 3.29, depth: 5, max: 6, margin: 44 },
+              { id: 's3', coord: 'S1-F03', sku: 'Red Bull Original 12oz', price: 3.49, depth: 0, max: 6, margin: 38, aiSwap: 'Alani Nu Cherry Slush (+$48/wk)' },
+              { id: 's4', coord: 'S1-F04', sku: 'Red Bull Sugarfree', price: 3.49, depth: 2, max: 6, margin: 38 },
+              { id: 's5', coord: 'S2-F01', sku: 'Monster Zero Ultra', price: 3.19, depth: 6, max: 6, margin: 41 },
+              { id: 's6', coord: 'S2-F02', sku: 'Monster Original 16oz', price: 3.19, depth: 4, max: 6, margin: 40 },
+              { id: 's7', coord: 'S2-F03', sku: 'Alani Nu Cherry Slush', price: 3.29, depth: 1, max: 6, margin: 46 },
+              { id: 's8', coord: 'S2-F04', sku: 'Reign White Gummy', price: 3.29, depth: 0, max: 6, margin: 43, aiSwap: 'Celsius Fizz-Free Blue (+$36/wk)' },
+            ],
+          },
+          {
+            id: 'd2',
+            number: '02',
+            label: 'Door 02 · CSD & Hydration',
+            tempF: 36.8,
+            humidity: 47,
+            slots: [
+              { id: 's9', coord: 'S1-F01', sku: 'Coca-Cola Zero 20oz', price: 2.69, depth: 6, max: 6, margin: 48 },
+              { id: 's10', coord: 'S1-F02', sku: 'Coca-Cola Original 20oz', price: 2.69, depth: 5, max: 6, margin: 47 },
+              { id: 's11', coord: 'S1-F03', sku: 'Sprite Lemon-Lime 20oz', price: 2.69, depth: 2, max: 6, margin: 46 },
+              { id: 's12', coord: 'S1-F04', sku: 'Dr Pepper Zero 20oz', price: 2.69, depth: 6, max: 6, margin: 45 },
+              { id: 's13', coord: 'S2-F01', sku: 'Gatorade Cool Blue 28oz', price: 2.99, depth: 0, max: 6, margin: 42, aiSwap: 'Gatorlyte Rapid Cherry (+$41/wk)' },
+              { id: 's14', coord: 'S2-F02', sku: 'Gatorade Glacier Freeze', price: 2.99, depth: 5, max: 6, margin: 42 },
+              { id: 's15', coord: 'S2-F03', sku: 'Liquid Death Lime 19.2', price: 2.49, depth: 6, max: 6, margin: 51 },
+              { id: 's16', coord: 'S2-F04', sku: 'Smartwater 1L', price: 2.99, depth: 4, max: 6, margin: 54 },
+            ],
+          },
+        ];
+
+        const INITIAL_INVENTORY = [
+          { id: 'inv1', name: 'Celsius Peach Vibe 12oz', upc: '889392014021', distributor: 'PepsiCo', backroom: 36, floor: 11, caseCost: 22.8, retail: 3.29 },
+          { id: 'inv2', name: 'Red Bull Original 12oz', upc: '611269101713', distributor: 'Direct DSD', backroom: 14, floor: 2, caseCost: 48.4, retail: 3.49 },
+          { id: 'inv3', name: 'Coca-Cola Zero Sugar 20oz', upc: '049000042566', distributor: 'Swire Coca-Cola', backroom: 48, floor: 12, caseCost: 31.2, retail: 2.69 },
+          { id: 'inv4', name: 'Monster Zero Ultra 16oz', upc: '070847811169', distributor: 'Swire Coca-Cola', backroom: 28, floor: 10, caseCost: 41.5, retail: 3.19 },
+          { id: 'inv5', name: 'Gatorade Cool Blue 28oz', upc: '052000338812', distributor: 'PepsiCo', backroom: 8, floor: 5, caseCost: 26.4, retail: 2.99 },
+        ];
+
+        const SCAN_SAMPLES = [
+          { upc: '049000042566', name: 'Coca-Cola Zero Sugar 20oz', door: 'Door 02 · S1-F01', price: '$2.69', status: 'Verified · 6/6 Units' },
+          { upc: '889392014021', name: 'Celsius Peach Vibe 12oz', door: 'Door 01 · S1-F01', price: '$3.29', status: 'High Velocity · +18% Lift' },
+          { upc: '611269101713', name: 'Red Bull Original 12oz', door: 'Door 01 · S1-F03', price: '$3.49', status: 'OOS Flagged · Restock Queued' },
+        ];
+
+        let state = {
+          tab: 'dashboard',
+          dark: false,
+          autoTour: true,
+          selectedDoorId: 'd1',
+          selectedSlotId: 's3',
+          invFilter: 'all',
+          scanIndex: 0,
+          scanVerifiedCount: 14,
+          poCases: { inv2: 2, inv5: 3, inv1: 1 },
+          poSubmitted: false,
+          aiPassApplied: false,
+          doors: JSON.parse(JSON.stringify(INITIAL_DOORS)),
+          inventory: JSON.parse(JSON.stringify(INITIAL_INVENTORY)),
+        };
+
+        const stage = document.getElementById('stage');
+        const viewTitle = document.getElementById('viewTitle');
+        const tourBtn = document.getElementById('tourBtn');
+        const tourBtnLabel = document.getElementById('tourBtnLabel');
+        const tourProgressBar = document.getElementById('tourProgressBar');
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const toastEl = document.getElementById('toast');
+        let toastTimer = null;
+
+        function showToast(msg) {
+          toastEl.textContent = msg;
+          toastEl.classList.add('show');
+          if (toastTimer) clearTimeout(toastTimer);
+          toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2600);
+        }
+
+        function computeMetrics() {
+          const allSlots = state.doors.flatMap((d) => d.slots);
+          const oosCount = allSlots.filter((s) => s.depth === 0).length;
+          const aligned = allSlots.filter((s) => s.depth > 1).length;
+          const compliance = Math.round((aligned / allSlots.length) * 1000) / 10;
+          const avgTemp = (
+            state.doors.reduce((acc, d) => acc + d.tempF, 0) / state.doors.length
+          ).toFixed(1);
+          const weeklyLift = 217 + (allSlots.length - oosCount) * 8 + (state.aiPassApplied ? 95 : 0);
+
+          document.getElementById('kpiCompliance').textContent = compliance.toFixed(1) + '%';
+          document.getElementById('kpiComplianceSub').textContent = `${aligned} / ${allSlots.length} facings healthy`;
+          document.getElementById('kpiOos').textContent = String(oosCount);
+          document.getElementById('kpiOosSub').textContent = oosCount === 0 ? 'All facings stocked' : 'Walk-in pull queued';
+          document.getElementById('kpiTemp').textContent = avgTemp + '°F';
+          document.getElementById('kpiLift').textContent = '+$' + weeklyLift;
+
+          return { compliance, oosCount, avgTemp, weeklyLift };
+        }
+
+        function updateNavActive() {
+          document.querySelectorAll('.nav-btn').forEach((btn) => {
+            btn.classList.toggle('active', btn.dataset.tab === state.tab);
+          });
+          viewTitle.textContent = TAB_TITLES[state.tab];
+        }
+
+        function renderDashboard() {
+          const door = state.doors.find((d) => d.id === state.selectedDoorId) || state.doors[0];
+          const selectedSlot = door.slots.find((s) => s.id === state.selectedSlotId) || door.slots[0];
+          const doorOos = door.slots.filter((s) => s.depth === 0).length;
+          const doorHealthy = door.slots.filter((s) => s.depth > 1).length;
+          const doorCompliance = Math.round((doorHealthy / door.slots.length) * 100);
+          const dashCircumference = 2 * Math.PI * 26;
+          const dashOffset = dashCircumference - (doorCompliance / 100) * dashCircumference;
+
+          const row1 = door.slots.slice(0, 4);
+          const row2 = door.slots.slice(4, 8);
+
+          const renderSlot = (slot, idx) => {
+            const pct = Math.round((slot.depth / slot.max) * 100);
+            const cls = slot.depth === 0 ? 'oos' : slot.depth <= 2 ? 'low' : '';
+            const statusCls = slot.depth === 0 ? 'st-oos' : slot.depth <= 2 ? 'st-low' : 'st-ok';
+            const fillColor = slot.depth === 0 ? '#ef4444' : slot.depth <= 2 ? '#f59e0b' : '#10b981';
+            const statusText = slot.depth === 0 ? 'Out of Stock' : slot.depth <= 2 ? 'Low Depth' : 'Optimal';
+
+            return `
+              <button
+                type="button"
+                class="slot-tile ${cls} ${selectedSlot.id === slot.id ? 'selected' : ''}"
+                style="animation-delay: ${idx * 45}ms"
+                data-slot-id="${slot.id}"
+              >
+                <div class="slot-top mono">
+                  <span>${slot.coord}</span>
+                  <span>$${slot.price.toFixed(2)}</span>
+                </div>
+                <div class="slot-sku">${slot.sku}</div>
+                <div class="depth-track">
+                  <div class="depth-fill" style="transform: scaleX(${Math.max(0.05, pct / 100)}); background: ${fillColor};"></div>
+                </div>
+                <div class="slot-top">
+                  <span class="status-text ${statusCls}">${statusText}</span>
+                  <span class="mono">${slot.depth}/${slot.max}</span>
+                </div>
+              </button>
+            `;
+          };
+
+          stage.innerHTML = `
+            <div class="dash-grid">
+              <div class="card" style="padding: 18px;">
+                <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px;">
+                  <div>
+                    <h2 style="font-size:16px; font-weight:700;">${door.label}</h2>
+                    <div class="meta-line" style="margin-top:3px;">
+                      <span class="mono">${door.tempF.toFixed(1)}°F</span>
+                      <span aria-hidden="true">·</span>
+                      <span class="mono">${door.humidity}% RH</span>
+                      <span aria-hidden="true">·</span>
+                      <span>${doorOos} OOS Gaps</span>
+                    </div>
+                  </div>
+                  <div class="door-tabs">
+                    ${state.doors
+                      .map(
+                        (d) =>
+                          `<button type="button" class="door-tab ${d.id === door.id ? 'active' : ''}" data-door-id="${d.id}">Door ${d.number}</button>`
+                      )
+                      .join('')}
+                  </div>
+                </div>
+
+                <div class="cabinet">
+                  <div class="shelf-row">${row1.map((s, i) => renderSlot(s, i)).join('')}</div>
+                  <div class="shelf-row">${row2.map((s, i) => renderSlot(s, i + 4)).join('')}</div>
+                </div>
+
+                <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; margin-top:14px;">
+                  <span style="font-size:12px; color:var(--text-2);">Click any shelf slot to inspect or restock depth.</span>
+                  <button class="btn-secondary" type="button" id="restockDoorOosBtn">Restock Door ${door.number} OOS (${doorOos})</button>
+                </div>
+              </div>
+
+              <div style="display:flex; flex-direction:column; gap:16px;">
+                <div class="card" style="padding: 18px;">
+                  <div class="ring-wrap">
+                    <svg class="ring-svg" width="66" height="66" viewBox="0 0 66 66" aria-hidden="true">
+                      <circle cx="33" cy="33" r="26" fill="none" stroke="var(--border)" stroke-width="6"></circle>
+                      <circle
+                        class="progress"
+                        cx="33" cy="33" r="26"
+                        fill="none"
+                        stroke="var(--accent)"
+                        stroke-width="6"
+                        stroke-linecap="round"
+                        stroke-dasharray="${dashCircumference}"
+                        stroke-dashoffset="${dashOffset}"
+                        transform="rotate(-90 33 33)"
+                      ></circle>
+                      <text x="33" y="37" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)" class="mono">${doorCompliance}%</text>
+                    </svg>
+                    <div>
+                      <div style="font-size:13px; font-weight:700;">Selected Facing · ${selectedSlot.coord}</div>
+                      <div style="font-size:15px; font-weight:700; color:var(--accent); margin-top:2px;">${selectedSlot.sku}</div>
+                      <div class="meta-line" style="margin-top:3px;">
+                        <span class="mono">Depth ${selectedSlot.depth}/${selectedSlot.max}</span>
+                        <span aria-hidden="true">·</span>
+                        <span class="mono">${selectedSlot.margin}% margin</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;">
+                    <button class="btn-primary" type="button" id="restockSlotBtn">Fill Facing (${selectedSlot.max}/${selectedSlot.max})</button>
+                    ${
+                      selectedSlot.aiSwap
+                        ? `<button class="btn-secondary" type="button" id="applyAiSlotBtn">Apply AI Swap</button>`
+                        : ''
+                    }
+                  </div>
+                  ${
+                    selectedSlot.aiSwap
+                      ? `<p style="font-size:12px; color:var(--emerald); font-weight:600; margin:10px 0 0;">AI Recommendation: ${selectedSlot.aiSwap}</p>`
+                      : ''
+                  }
+                </div>
+
+                <div class="card" style="padding: 18px;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                    <h3 style="font-size:14px; font-weight:700;">Cold-Chain Thermal Curve (24h)</h3>
+                    <span class="mono" style="font-size:12px; color:var(--emerald); font-weight:600;">Nominal ${door.tempF.toFixed(1)}°F</span>
+                  </div>
+                  <svg viewBox="0 0 340 92" width="100%" height="92" aria-label="24-hour temperature telemetry curve">
+                    <rect x="0" y="20" width="340" height="44" rx="6" fill="var(--emerald-soft)"></rect>
+                    <path
+                      class="wave-path"
+                      d="M 8 52 C 42 44, 68 38, 102 45 C 138 53, 165 34, 200 40 C 235 46, 268 35, 332 41"
+                      fill="none"
+                      stroke="var(--accent)"
+                      stroke-width="2.6"
+                      stroke-linecap="round"
+                    ></path>
+                    <circle cx="332" cy="41" r="4.5" fill="var(--accent)"></circle>
+                  </svg>
+                  <div class="meta-line" style="margin-top:4px;">
+                    <span>00:00</span>
+                    <span aria-hidden="true">·</span>
+                    <span>Compressor Cycle Balanced</span>
+                    <span aria-hidden="true">·</span>
+                    <span>Now</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+
+          stage.querySelectorAll('[data-door-id]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              state.selectedDoorId = btn.dataset.doorId;
+              const nextDoor = state.doors.find((d) => d.id === state.selectedDoorId);
+              if (nextDoor) state.selectedSlotId = nextDoor.slots[0].id;
+              render();
+            });
+          });
+
+          stage.querySelectorAll('[data-slot-id]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              state.selectedSlotId = btn.dataset.slotId;
+              render();
+            });
+          });
+
+          document.getElementById('restockSlotBtn')?.addEventListener('click', () => {
+            selectedSlot.depth = selectedSlot.max;
+            computeMetrics();
+            render();
+            showToast(`Restocked ${selectedSlot.coord} (${selectedSlot.sku}) to full depth.`);
+          });
+
+          document.getElementById('applyAiSlotBtn')?.addEventListener('click', () => {
+            if (!selectedSlot.aiSwap) return;
+            selectedSlot.sku = selectedSlot.aiSwap.split(' (+')[0];
+            selectedSlot.depth = selectedSlot.max;
+            selectedSlot.margin = 47;
+            selectedSlot.aiSwap = null;
+            computeMetrics();
+            render();
+            showToast(`Applied AI swap on ${selectedSlot.coord}.`);
+          });
+
+          document.getElementById('restockDoorOosBtn')?.addEventListener('click', () => {
+            let filled = 0;
+            door.slots.forEach((s) => {
+              if (s.depth === 0) {
+                s.depth = s.max;
+                filled++;
+              }
+            });
+            computeMetrics();
+            render();
+            showToast(filled > 0 ? `Restocked ${filled} OOS facings on Door ${door.number}.` : 'No OOS facings remaining.');
+          });
+        }
+
+        function renderInventory() {
+          const filtered = state.inventory.filter((item) => {
+            if (state.invFilter === 'oos') return item.backroom < 16 || item.floor < 5;
+            if (state.invFilter === 'high') return item.retail - item.caseCost / 12 >= 1.25;
+            return true;
+          });
+
+          stage.innerHTML = `
+            <div class="card" style="padding: 18px;">
+              <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px;">
+                <div>
+                  <h2 style="font-size:16px; font-weight:700;">Walk-In &amp; Distributor UPC Catalog</h2>
+                  <div class="meta-line" style="margin-top:3px;">
+                    <span>Swire Coca-Cola &amp; PepsiCo Net Case Costs</span>
+                    <span aria-hidden="true">·</span>
+                    <span class="mono">${filtered.length} SKUs Shown</span>
+                  </div>
+                </div>
+                <div class="door-tabs">
+                  <button type="button" class="door-tab ${state.invFilter === 'all' ? 'active' : ''}" data-inv-filter="all">All SKUs</button>
+                  <button type="button" class="door-tab ${state.invFilter === 'oos' ? 'active' : ''}" data-inv-filter="oos">Low Stock Risk</button>
+                  <button type="button" class="door-tab ${state.invFilter === 'high' ? 'active' : ''}" data-inv-filter="high">High Margin</button>
+                </div>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Beverage SKU</th>
+                      <th>UPC</th>
+                      <th>Distributor</th>
+                      <th class="num">Walk-In</th>
+                      <th class="num">Cooler</th>
+                      <th class="num">Case Net</th>
+                      <th class="num">Retail</th>
+                      <th class="num">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${filtered
+                      .map(
+                        (item) => `
+                        <tr>
+                          <td style="font-weight:600;">${item.name}</td>
+                          <td class="mono" style="color:var(--text-3);">${item.upc}</td>
+                          <td style="color:var(--text-2);">${item.distributor}</td>
+                          <td class="num mono" style="font-weight:700; color:${item.backroom < 16 ? 'var(--amber)' : 'var(--text)'};">${item.backroom} u</td>
+                          <td class="num mono">${item.floor} u</td>
+                          <td class="num mono">$${item.caseCost.toFixed(2)}</td>
+                          <td class="num mono">$${item.retail.toFixed(2)}</td>
+                          <td class="num">
+                            <button type="button" class="btn-secondary" style="min-height:32px; padding:4px 10px; font-size:11.5px;" data-add-case="${item.id}">+1 Case</button>
+                          </td>
+                        </tr>
+                      `
+                      )
+                      .join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+
+          stage.querySelectorAll('[data-inv-filter]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              state.invFilter = btn.dataset.invFilter;
+              render();
+            });
+          });
+
+          stage.querySelectorAll('[data-add-case]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              const target = state.inventory.find((i) => i.id === btn.dataset.addCase);
+              if (target) {
+                target.backroom += 12;
+                render();
+                showToast(`Added +12 units (${target.name}) to walk-in stock.`);
+              }
+            });
+          });
+        }
+
+        function renderScan() {
+          const sample = SCAN_SAMPLES[state.scanIndex % SCAN_SAMPLES.length];
+          stage.innerHTML = `
+            <div class="dash-grid">
+              <div class="scan-viewport">
+                <div class="laser-beam"></div>
+                <div class="reticle tl"></div>
+                <div class="reticle tr"></div>
+                <div class="reticle bl"></div>
+                <div class="reticle br"></div>
+
+                <div style="display:flex; align-items:center; justify-content:space-between; color:#e2e8f0; font-size:12px;">
+                  <span class="mono" style="color:#38bdf8; font-weight:600;">OPTICAL SCANNER · REAR CAMERA FEED</span>
+                  <span class="mono">${state.scanVerifiedCount} SKUs Verified</span>
+                </div>
+
+                <div class="scan-boxes">
+                  ${SCAN_SAMPLES.map((item, idx) => {
+                    const active = idx === state.scanIndex % SCAN_SAMPLES.length;
+                    return `
+                      <div class="scan-box ${active ? 'highlight' : ''}">
+                        <div class="mono" style="font-size:10.5px; color:#38bdf8;">${item.upc}</div>
+                        <div style="font-size:13px; font-weight:700; margin-top:4px;">${item.name}</div>
+                        <div style="font-size:11px; color:#94a3b8; margin-top:4px;">${item.door}</div>
+                        <div class="mono" style="font-size:11px; color:${active ? '#34d399' : '#cbd5e1'}; margin-top:6px;">${item.status}</div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+
+                <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px;">
+                  <span style="font-size:12px; color:#94a3b8;">Laser sweep locks UPC-A, EAN-13, and cooler door QR tags automatically.</span>
+                  <button class="btn-primary" type="button" id="simulateScanBtn">Simulate Next Barcode Scan</button>
+                </div>
+              </div>
+
+              <div class="card" style="padding:18px; display:flex; flex-direction:column; gap:12px;">
+                <h2 style="font-size:16px; font-weight:700;">Last Decoded Beverage</h2>
+                <div style="padding:14px; border-radius:10px; background:var(--surface-muted); border:1px solid var(--border);">
+                  <div class="mono" style="font-size:12px; color:var(--accent); font-weight:600;">UPC ${sample.upc}</div>
+                  <div style="font-size:16px; font-weight:700; margin-top:4px;">${sample.name}</div>
+                  <div class="meta-line">
+                    <span>${sample.door}</span>
+                    <span aria-hidden="true">·</span>
+                    <span class="mono">${sample.price}</span>
+                  </div>
+                  <div style="font-size:12.5px; font-weight:600; color:var(--emerald); margin-top:8px;">${sample.status}</div>
+                </div>
+                <button class="btn-secondary" type="button" id="scanJumpDashBtn">Inspect Slot on Planogram</button>
+              </div>
+            </div>
+          `;
+
+          document.getElementById('simulateScanBtn')?.addEventListener('click', () => {
+            state.scanIndex = (state.scanIndex + 1) % SCAN_SAMPLES.length;
+            state.scanVerifiedCount += 1;
+            const nextSample = SCAN_SAMPLES[state.scanIndex];
+            render();
+            showToast(`Decoded ${nextSample.upc} · ${nextSample.name}`);
+          });
+
+          document.getElementById('scanJumpDashBtn')?.addEventListener('click', () => {
+            state.tab = 'dashboard';
+            state.autoTour = false;
+            updateNavActive();
+            updateTourUi();
+            render();
+          });
+        }
+
+        function renderOrders() {
+          const lines = state.inventory.filter((item) => state.poCases[item.id] > 0 || item.backroom < 20);
+          const totalCases = lines.reduce((acc, l) => acc + (state.poCases[l.id] || 0), 0);
+          const totalCost = lines.reduce((acc, l) => acc + (state.poCases[l.id] || 0) * l.caseCost, 0);
+
+          stage.innerHTML = `
+            <div class="card" style="padding: 18px;">
+              <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px;">
+                <div>
+                  <h2 style="font-size:16px; font-weight:700;">Distributor Replenishment Purchase Order</h2>
+                  <div class="meta-line" style="margin-top:3px;">
+                    <span>PO-APEX-104</span>
+                    <span aria-hidden="true">·</span>
+                    <span class="mono">${totalCases} Total Cases</span>
+                    <span aria-hidden="true">·</span>
+                    <span class="mono" style="color:var(--accent); font-weight:700;">$${totalCost.toFixed(2)} Wholesale Net</span>
+                  </div>
+                </div>
+                <button class="btn-primary" type="button" id="submitPoBtn" ${totalCases === 0 ? 'disabled' : ''}>
+                  ${state.poSubmitted ? 'PO Submitted to Route' : 'Submit Distributor PO'}
+                </button>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>SKU</th>
+                      <th>Distributor</th>
+                      <th class="num">Case Cost</th>
+                      <th class="num">Cases</th>
+                      <th class="num">Line Net</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${lines
+                      .map((item) => {
+                        const qty = state.poCases[item.id] || 0;
+                        return `
+                          <tr>
+                            <td style="font-weight:600;">${item.name}</td>
+                            <td style="color:var(--text-2);">${item.distributor}</td>
+                            <td class="num mono">$${item.caseCost.toFixed(2)}</td>
+                            <td class="num">
+                              <div style="display:inline-flex; align-items:center; gap:6px;">
+                                <button type="button" class="btn-secondary" style="min-height:30px; padding:2px 9px;" data-po-dec="${item.id}">-</button>
+                                <span class="mono" style="min-width:22px; text-align:center; font-weight:700;">${qty}</span>
+                                <button type="button" class="btn-secondary" style="min-height:30px; padding:2px 9px;" data-po-inc="${item.id}">+</button>
+                              </div>
+                            </td>
+                            <td class="num mono" style="font-weight:700;">$${(qty * item.caseCost).toFixed(2)}</td>
+                          </tr>
+                        `;
+                      })
+                      .join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+
+          stage.querySelectorAll('[data-po-inc]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              state.poCases[btn.dataset.poInc] = (state.poCases[btn.dataset.poInc] || 0) + 1;
+              state.poSubmitted = false;
+              render();
+            });
+          });
+
+          stage.querySelectorAll('[data-po-dec]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              state.poCases[btn.dataset.poDec] = Math.max(0, (state.poCases[btn.dataset.poDec] || 0) - 1);
+              state.poSubmitted = false;
+              render();
+            });
+          });
+
+          document.getElementById('submitPoBtn')?.addEventListener('click', () => {
+            state.poSubmitted = true;
+            render();
+            showToast(`Submitted PO-APEX-104 (${totalCases} cases · $${totalCost.toFixed(2)}).`);
+          });
+        }
+
+        function renderReports() {
+          const categories = [
+            { label: 'Energy', pct: 88, lift: '+$148/wk' },
+            { label: 'Zero Sugar CSD', pct: 74, lift: '+$96/wk' },
+            { label: 'Hydration', pct: 62, lift: '+$64/wk' },
+            { label: 'RTD Coffee', pct: 49, lift: '+$34/wk' },
+          ];
+
+          stage.innerHTML = `
+            <div class="dash-grid">
+              <div class="card" style="padding: 18px;">
+                <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px;">
+                  <div>
+                    <h2 style="font-size:16px; font-weight:700;">Category Velocity &amp; Margin Performance</h2>
+                    <div class="meta-line" style="margin-top:3px;">
+                      <span>Eye-Level Shelf Share vs Weekly Dollar Contribution</span>
+                    </div>
+                  </div>
+                  <button class="btn-primary" type="button" id="runAiPassBtn">
+                    ${state.aiPassApplied ? 'AI Pass Applied' : 'Simulate AI Margin Pass'}
+                  </button>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:14px;">
+                  ${categories
+                    .map((cat, idx) => {
+                      const adjPct = state.aiPassApplied ? Math.min(98, cat.pct + 8) : cat.pct;
+                      return `
+                        <div>
+                          <div style="display:flex; justify-content:space-between; font-size:12.5px; font-weight:600; margin-bottom:5px;">
+                            <span>${cat.label}</span>
+                            <span class="mono" style="color:var(--emerald);">${adjPct}% target · ${cat.lift}</span>
+                          </div>
+                          <div style="height:10px; border-radius:999px; background:var(--surface-muted); overflow:hidden;">
+                            <div style="height:100%; border-radius:999px; background:var(--accent); transform-origin:left center; transform:scaleX(${adjPct / 100}); transition: transform 520ms var(--ease) ${idx * 60}ms;"></div>
+                          </div>
+                        </div>
+                      `;
+                    })
+                    .join('')}
+                </div>
+              </div>
+
+              <div class="card" style="padding: 18px;">
+                <h3 style="font-size:15px; font-weight:700; margin-bottom:10px;">Recent Shelf Audit Ledger</h3>
+                <div style="display:flex; flex-direction:column; gap:10px; font-size:12.5px;">
+                  <div style="padding:10px 12px; border-radius:9px; background:var(--surface-muted); border:1px solid var(--border);">
+                    <div style="font-weight:600;">Door 01 · Optical Audit Verified</div>
+                    <div class="meta-line"><span>96.4% confidence</span><span aria-hidden="true">·</span><span>2 OOS gaps flagged</span></div>
+                  </div>
+                  <div style="padding:10px 12px; border-radius:9px; background:var(--surface-muted); border:1px solid var(--border);">
+                    <div style="font-weight:600;">Door 02 · Cold-Chain Nominal</div>
+                    <div class="meta-line"><span>36.8°F</span><span aria-hidden="true">·</span><span>Zero thermal faults</span></div>
+                  </div>
+                  <div style="padding:10px 12px; border-radius:9px; background:var(--surface-muted); border:1px solid var(--border);">
+                    <div style="font-weight:600;">Swire &amp; PepsiCo Cost Sync</div>
+                    <div class="meta-line"><span>157 SKUs active</span><span aria-hidden="true">·</span><span>CSV synchronized</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+
+          document.getElementById('runAiPassBtn')?.addEventListener('click', () => {
+            state.aiPassApplied = true;
+            computeMetrics();
+            render();
+            showToast('Applied AI margin pass (+$95/wk projected lift).');
+          });
+        }
+
+        function render() {
+          computeMetrics();
+          if (state.tab === 'dashboard') renderDashboard();
+          else if (state.tab === 'inventory') renderInventory();
+          else if (state.tab === 'scan') renderScan();
+          else if (state.tab === 'orders') renderOrders();
+          else renderReports();
+        }
+
+        function updateTourUi() {
+          tourBtnLabel.textContent = state.autoTour ? 'Pause Auto-Tour' : 'Play Auto-Tour';
+          tourProgressBar.classList.toggle('running', state.autoTour);
+        }
+
+        // Navigation listeners
+        document.querySelectorAll('.nav-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            state.tab = btn.dataset.tab;
+            state.autoTour = false;
+            updateNavActive();
+            updateTourUi();
+            render();
+          });
+        });
+
+        document.getElementById('brandBtn').addEventListener('click', () => {
+          state.tab = 'dashboard';
+          updateNavActive();
+          render();
+        });
+
+        tourBtn.addEventListener('click', () => {
+          state.autoTour = !state.autoTour;
+          updateTourUi();
+          showToast(state.autoTour ? 'Auto-Tour resumed across all 5 workflows.' : 'Auto-Tour paused.');
+        });
+
+        themeToggleBtn.addEventListener('click', () => {
+          state.dark = !state.dark;
+          document.documentElement.classList.toggle('dark', state.dark);
+          themeToggleBtn.textContent = state.dark ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+        });
+
+        document.getElementById('resetProtoBtn').addEventListener('click', () => {
+          state.doors = JSON.parse(JSON.stringify(INITIAL_DOORS));
+          state.inventory = JSON.parse(JSON.stringify(INITIAL_INVENTORY));
+          state.aiPassApplied = false;
+          state.poSubmitted = false;
+          state.poCases = { inv2: 2, inv5: 3, inv1: 1 };
+          state.scanIndex = 0;
+          render();
+          showToast('Reset prototype state to initial baseline.');
+        });
+
+        // Respect reduced motion for auto-tour default
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          state.autoTour = false;
+          updateTourUi();
+        }
+
+        // Auto-Tour timer
+        setInterval(() => {
+          if (!state.autoTour) return;
+          const idx = TABS.indexOf(state.tab);
+          state.tab = TABS[(idx + 1) % TABS.length];
+          if (state.tab === 'scan') {
+            state.scanIndex = (state.scanIndex + 1) % SCAN_SAMPLES.length;
+          }
+          updateNavActive();
+          render();
+        }, 4500);
+
+        updateNavActive();
+        updateTourUi();
+        render();
+      })();
+    </script>
+  </body>
+</html>

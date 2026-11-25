@@ -1,0 +1,6 @@
+{
+  "name": "KoolerIQ",
+  "description": "Cold-chain retail cooler telemetry, AI planogram optimization, and real-time shelf audit platform (www.kooleriq.com).",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

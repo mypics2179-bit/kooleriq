@@ -1,0 +1,680 @@
+{
+  "entities": {
+    "UserWorkspaceRoot": {
+      "title": "UserWorkspaceRoot",
+      "description": "Non-PII operator preferences, active store pointer, onboarding state, and subscription quota.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "activeStoreId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "operatorRole": {
+          "type": "string",
+          "enum": ["store-manager", "route-merchandiser", "multi-store-owner", "distributor-rep"],
+          "maxLength": 40
+        },
+        "onboardingCompleted": {
+          "type": "boolean"
+        },
+        "dismissedChecklist": {
+          "type": "boolean"
+        },
+        "completedSteps": {
+          "type": "array"
+        },
+        "planTier": {
+          "type": "string",
+          "enum": ["starter", "pro", "enterprise"],
+          "maxLength": 20
+        },
+        "billingCycle": {
+          "type": "string",
+          "enum": ["monthly", "annual"],
+          "maxLength": 20
+        },
+        "doorQuota": {
+          "type": "number"
+        },
+        "storeCount": {
+          "type": "number"
+        },
+        "googlePlayLinked": {
+          "type": "boolean"
+        },
+        "subscriptionStatus": {
+          "type": "string",
+          "enum": ["active", "trialing", "paused"],
+          "maxLength": 20
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "ownerId",
+        "displayName",
+        "activeStoreId",
+        "operatorRole",
+        "onboardingCompleted",
+        "dismissedChecklist",
+        "completedSteps",
+        "planTier",
+        "billingCycle",
+        "doorQuota",
+        "storeCount",
+        "googlePlayLinked",
+        "subscriptionStatus",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "UserPrivateInfo": {
+      "title": "UserPrivateInfo",
+      "description": "Strictly isolated user PII document containing account email and operator identity.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "minLength": 3,
+          "maxLength": 254
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["ownerId", "email", "displayName", "createdAt", "updatedAt"]
+    },
+    "StoreDocument": {
+      "title": "StoreDocument",
+      "description": "Per-store cooler configuration, door grids, planogram insights, shelf audits, and store settings.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "storeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "layoutTemplate": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "storeName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "storeCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "address": {
+          "type": "string",
+          "maxLength": 240
+        },
+        "routeId": {
+          "type": "string",
+          "maxLength": 60
+        },
+        "tempUnit": {
+          "type": "string",
+          "enum": ["F", "C"],
+          "maxLength": 4
+        },
+        "settings": {
+          "type": "object"
+        },
+        "carriedSkuIds": {
+          "type": "array"
+        },
+        "doors": {
+          "type": "array"
+        },
+        "insights": {
+          "type": "array"
+        },
+        "audits": {
+          "type": "array"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "ownerId",
+        "storeId",
+        "layoutTemplate",
+        "storeName",
+        "storeCode",
+        "tempUnit",
+        "settings",
+        "carriedSkuIds",
+        "doors",
+        "insights",
+        "audits",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "CustomSkuItem": {
+      "title": "CustomSkuItem",
+      "description": "Store-added custom beverage SKU or user-adjusted walk-in backstock count.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "skuId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "skuCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "shortName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "brand": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "brandLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "brandColor": {
+          "type": "string",
+          "maxLength": 24
+        },
+        "size": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "containerType": {
+          "type": "string",
+          "enum": ["can", "tall-can", "bottle", "glass-bottle"],
+          "maxLength": 24
+        },
+        "price": {
+          "type": "number"
+        },
+        "weeklyVelocity": {
+          "type": "number"
+        },
+        "marginPct": {
+          "type": "number"
+        },
+        "backroomQty": {
+          "type": "number"
+        },
+        "parLevel": {
+          "type": "number"
+        },
+        "primaryColor": {
+          "type": "string",
+          "maxLength": 24
+        },
+        "secondaryColor": {
+          "type": "string",
+          "maxLength": 24
+        },
+        "capColor": {
+          "type": "string",
+          "maxLength": 24
+        },
+        "upc": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "distributor": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "category": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "unitsPerCase": {
+          "type": "number"
+        },
+        "netCaseCost": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "ownerId",
+        "skuId",
+        "skuCode",
+        "name",
+        "shortName",
+        "brand",
+        "brandLabel",
+        "containerType",
+        "price",
+        "backroomQty",
+        "parLevel",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "DistributorOrder": {
+      "title": "DistributorOrder",
+      "description": "Swire Coca-Cola / PepsiCo case restock purchase order record.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "poNumber": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 64
+        },
+        "storeName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "distributorSummary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "totalCases": {
+          "type": "number"
+        },
+        "totalUnits": {
+          "type": "number"
+        },
+        "totalWholesaleCost": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["submitted", "received"],
+          "maxLength": 20
+        },
+        "lines": {
+          "type": "array"
+        },
+        "createdAtIso": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "ownerId",
+        "poNumber",
+        "storeName",
+        "distributorSummary",
+        "totalCases",
+        "totalUnits",
+        "totalWholesaleCost",
+        "status",
+        "lines",
+        "createdAtIso",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "AuditLogRecord": {
+      "title": "AuditLogRecord",
+      "description": "Append-only operational compliance event in the store audit ledger.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["shelf-audit", "planogram", "inventory", "layout", "cold-chain", "csv", "media", "system"],
+          "maxLength": 24
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["info", "success", "warning", "critical"],
+          "maxLength": 20
+        },
+        "actor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "storeName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "doorLabel": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "action": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "details": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600
+        },
+        "timestampIso": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "ownerId",
+        "category",
+        "severity",
+        "actor",
+        "storeName",
+        "action",
+        "details",
+        "timestampIso",
+        "createdAt"
+      ]
+    },
+    "NotificationRecord": {
+      "title": "NotificationRecord",
+      "description": "Operational cold-chain, OOS stock, and audit alert stored in user notification center.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["cold-chain", "stock", "audit", "system"],
+          "maxLength": 24
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["info", "warning", "critical", "success"],
+          "maxLength": 20
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "read": {
+          "type": "boolean"
+        },
+        "doorId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "targetTab": {
+          "type": "string",
+          "enum": ["dashboard", "inventory", "scan", "orders", "reports", "settings"],
+          "maxLength": 20
+        },
+        "timestampIso": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "ownerId",
+        "category",
+        "severity",
+        "title",
+        "message",
+        "read",
+        "timestampIso",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "MediaAssetRecord": {
+      "title": "MediaAssetRecord",
+      "description": "Metadata and compressed thumbnail reference for cooler audit photos and product pack shots.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "category": {
+          "type": "string",
+          "enum": ["cooler-capture", "product-pack", "brand-signage"],
+          "maxLength": 32
+        },
+        "url": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120000
+        },
+        "storeName": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "doorId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "doorLabel": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "skuId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "tags": {
+          "type": "array"
+        },
+        "builtIn": {
+          "type": "boolean"
+        },
+        "createdAtIso": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "ownerId",
+        "title",
+        "category",
+        "url",
+        "tags",
+        "createdAtIso",
+        "createdAt"
+      ]
+    },
+    "ChatMessageRecord": {
+      "title": "ChatMessageRecord",
+      "description": "Persisted Copilot conversation turn with model metadata and Search Grounding URLs.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["user", "model"],
+          "maxLength": 10
+        },
+        "modelUsed": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "content": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8000
+        },
+        "sources": {
+          "type": "array"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["ownerId", "role", "modelUsed", "content", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserWorkspaceRoot" },
+      "description": "Authenticated operator workspace root containing non-PII role, active store, onboarding, and subscription state."
+    },
+    "/users/{userId}/private/{docId}": {
+      "schema": { "$ref": "#/entities/UserPrivateInfo" },
+      "description": "Isolated PII storage for operator email and account profile."
+    },
+    "/users/{userId}/stores/{storeId}": {
+      "schema": { "$ref": "#/entities/StoreDocument" },
+      "description": "Custom retail store cooler layouts, shelf facings, audits, and recommendations owned by the user."
+    },
+    "/users/{userId}/customSkus/{skuId}": {
+      "schema": { "$ref": "#/entities/CustomSkuItem" },
+      "description": "Store-specific custom beverages and backstock overrides owned by the user."
+    },
+    "/users/{userId}/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/DistributorOrder" },
+      "description": "Distributor purchase orders owned by the user with terminal received-state locking."
+    },
+    "/users/{userId}/auditLogs/{entryId}": {
+      "schema": { "$ref": "#/entities/AuditLogRecord" },
+      "description": "Append-only operational compliance audit log entries owned by the user."
+    },
+    "/users/{userId}/notifications/{notifId}": {
+      "schema": { "$ref": "#/entities/NotificationRecord" },
+      "description": "User-scoped cold-chain and restock notifications."
+    },
+    "/users/{userId}/mediaAssets/{assetId}": {
+      "schema": { "$ref": "#/entities/MediaAssetRecord" },
+      "description": "Cooler audit snapshots and custom SKU image library entries owned by the user."
+    },
+    "/users/{userId}/chats/{messageId}": {
+      "schema": { "$ref": "#/entities/ChatMessageRecord" },
+      "description": "Persisted Copilot and Google Search Grounding chat messages owned by the user."
+    }
+  }
+}

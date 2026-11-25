@@ -1,0 +1,745 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net: default deny all paths unless explicitly matched below
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Phase 3: Global Hardened Primitives ---
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isVerifiedOwner(userId) {
+      return isVerifiedUser() && request.auth.uid == userId;
+    }
+
+    function parentUserRootExists(userId) {
+      return exists(/databases/$(database)/documents/users/$(userId)) ||
+        existsAfter(/databases/$(database)/documents/users/$(userId));
+    }
+
+    // --- Phase 2 & Validation Blueprints ---
+    function isValidUserWorkspaceRoot(data, userId) {
+      return data.keys().hasAll([
+          'ownerId',
+          'displayName',
+          'activeStoreId',
+          'operatorRole',
+          'onboardingCompleted',
+          'dismissedChecklist',
+          'completedSteps',
+          'planTier',
+          'billingCycle',
+          'doorQuota',
+          'storeCount',
+          'googlePlayLinked',
+          'subscriptionStatus',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'ownerId',
+          'displayName',
+          'activeStoreId',
+          'operatorRole',
+          'onboardingCompleted',
+          'dismissedChecklist',
+          'completedSteps',
+          'planTier',
+          'billingCycle',
+          'doorQuota',
+          'storeCount',
+          'googlePlayLinked',
+          'subscriptionStatus',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        data.ownerId is string &&
+        isValidId(data.ownerId) &&
+        data.ownerId == request.auth.uid &&
+        data.ownerId == userId &&
+        data.displayName is string &&
+        data.displayName.size() >= 1 &&
+        data.displayName.size() <= 100 &&
+        data.activeStoreId is string &&
+        isValidId(data.activeStoreId) &&
+        data.operatorRole is string &&
+        data.operatorRole in ['store-manager', 'route-merchandiser', 'multi-store-owner', 'distributor-rep'] &&
+        data.onboardingCompleted is bool &&
+        data.dismissedChecklist is bool &&
+        data.completedSteps is list &&
+        data.completedSteps.size() <= 20 &&
+        (data.completedSteps.size() == 0 || (data.completedSteps[0] is string && data.completedSteps[0].size() <= 60)) &&
+        data.planTier is string &&
+        data.planTier in ['starter', 'pro', 'enterprise'] &&
+        data.billingCycle is string &&
+        data.billingCycle in ['monthly', 'annual'] &&
+        data.doorQuota is number &&
+        data.doorQuota >= 1 &&
+        data.doorQuota <= 500 &&
+        data.storeCount is number &&
+        data.storeCount >= 1 &&
+        data.storeCount <= 200 &&
+        data.googlePlayLinked is bool &&
+        data.subscriptionStatus is string &&
+        data.subscriptionStatus in ['active', 'trialing', 'paused'] &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidUserPrivateInfo(data, userId) {
+      return data.keys().hasAll(['ownerId', 'email', 'displayName', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['ownerId', 'email', 'displayName', 'createdAt', 'updatedAt']) &&
+        data.ownerId is string &&
+        isValidId(data.ownerId) &&
+        data.ownerId == request.auth.uid &&
+        data.ownerId == userId &&
+        data.email is string &&
+        data.email.size() >= 3 &&
+        data.email.size() <= 254 &&
+        data.displayName is string &&
+        data.displayName.size() >= 1 &&
+        data.displayName.size() <= 100 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidStoreDocument(data, storeId) {
+      return data.keys().hasAll([
+          'ownerId',
+          'storeId',
+          'layoutTemplate',
+          'storeName',
+          'storeCode',
+          'tempUnit',
+          'settings',
+          'carriedSkuIds',
+          'doors',
+          'insights',
+          'audits',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'ownerId',
+          'storeId',
+          'layoutTemplate',
+          'storeName',
+          'storeCode',
+          'address',
+          'routeId',
+          'tempUnit',
+          'settings',
+          'carriedSkuIds',
+          'doors',
+          'insights',
+          'audits',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        data.ownerId is string &&
+        isValidId(data.ownerId) &&
+        data.ownerId == request.auth.uid &&
+        data.storeId is string &&
+        isValidId(data.storeId) &&
+        data.storeId == storeId &&
+        data.layoutTemplate is string &&
+        data.layoutTemplate.size() >= 1 &&
+        data.layoutTemplate.size() <= 120 &&
+        data.storeName is string &&
+        data.storeName.size() >= 1 &&
+        data.storeName.size() <= 120 &&
+        data.storeCode is string &&
+        data.storeCode.size() >= 1 &&
+        data.storeCode.size() <= 40 &&
+        (!('address' in data) || (data.address is string && data.address.size() <= 240)) &&
+        (!('routeId' in data) || (data.routeId is string && data.routeId.size() <= 60)) &&
+        data.tempUnit is string &&
+        data.tempUnit in ['F', 'C'] &&
+        data.settings is map &&
+        data.settings.keys().size() <= 20 &&
+        data.carriedSkuIds is list &&
+        data.carriedSkuIds.size() <= 300 &&
+        (data.carriedSkuIds.size() == 0 || (data.carriedSkuIds[0] is string && data.carriedSkuIds[0].size() <= 128)) &&
+        data.doors is list &&
+        data.doors.size() <= 24 &&
+        (data.doors.size() == 0 || data.doors[0] is map) &&
+        data.insights is list &&
+        data.insights.size() <= 100 &&
+        (data.insights.size() == 0 || data.insights[0] is map) &&
+        data.audits is list &&
+        data.audits.size() <= 100 &&
+        (data.audits.size() == 0 || data.audits[0] is map) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidCustomSku(data, skuId) {
+      return data.keys().hasAll([
+          'ownerId',
+          'skuId',
+          'skuCode',
+          'name',
+          'shortName',
+          'brand',
+          'brandLabel',
+          'containerType',
+          'price',
+          'backroomQty',
+          'parLevel',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'ownerId',
+          'skuId',
+          'skuCode',
+          'name',
+          'shortName',
+          'brand',
+          'brandLabel',
+          'brandColor',
+          'size',
+          'containerType',
+          'price',
+          'weeklyVelocity',
+          'marginPct',
+          'backroomQty',
+          'parLevel',
+          'primaryColor',
+          'secondaryColor',
+          'capColor',
+          'upc',
+          'distributor',
+          'category',
+          'unitsPerCase',
+          'netCaseCost',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        data.ownerId is string &&
+        isValidId(data.ownerId) &&
+        data.ownerId == request.auth.uid &&
+        data.skuId is string &&
+        isValidId(data.skuId) &&
+        data.skuId == skuId &&
+        data.skuCode is string &&
+        data.skuCode.size() >= 1 &&
+        data.skuCode.size() <= 64 &&
+        data.name is string &&
+        data.name.size() >= 1 &&
+        data.name.size() <= 160 &&
+        data.shortName is string &&
+        data.shortName.size() >= 1 &&
+        data.shortName.size() <= 80 &&
+        data.brand is string &&
+        data.brand.size() >= 1 &&
+        data.brand.size() <= 40 &&
+        data.brandLabel is string &&
+        data.brandLabel.size() >= 1 &&
+        data.brandLabel.size() <= 80 &&
+        (!('brandColor' in data) || (data.brandColor is string && data.brandColor.size() <= 24)) &&
+        (!('size' in data) || (data.size is string && data.size.size() <= 40)) &&
+        data.containerType is string &&
+        data.containerType in ['can', 'tall-can', 'bottle', 'glass-bottle'] &&
+        data.price is number &&
+        data.price >= 0 &&
+        data.price <= 500 &&
+        (!('weeklyVelocity' in data) || (data.weeklyVelocity is number && data.weeklyVelocity >= 0 && data.weeklyVelocity <= 100000)) &&
+        (!('marginPct' in data) || (data.marginPct is number && data.marginPct >= 0 && data.marginPct <= 100)) &&
+        data.backroomQty is number &&
+        data.backroomQty >= 0 &&
+        data.backroomQty <= 50000 &&
+        data.parLevel is number &&
+        data.parLevel >= 0 &&
+        data.parLevel <= 50000 &&
+        (!('primaryColor' in data) || (data.primaryColor is string && data.primaryColor.size() <= 24)) &&
+        (!('secondaryColor' in data) || (data.secondaryColor is string && data.secondaryColor.size() <= 24)) &&
+        (!('capColor' in data) || (data.capColor is string && data.capColor.size() <= 24)) &&
+        (!('upc' in data) || (data.upc is string && data.upc.size() <= 64)) &&
+        (!('distributor' in data) || (data.distributor is string && data.distributor.size() <= 120)) &&
+        (!('category' in data) || (data.category is string && data.category.size() <= 80)) &&
+        (!('unitsPerCase' in data) || (data.unitsPerCase is number && data.unitsPerCase >= 1 && data.unitsPerCase <= 200)) &&
+        (!('netCaseCost' in data) || (data.netCaseCost is number && data.netCaseCost >= 0 && data.netCaseCost <= 5000)) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidOrder(data) {
+      return data.keys().hasAll([
+          'ownerId',
+          'poNumber',
+          'storeName',
+          'distributorSummary',
+          'totalCases',
+          'totalUnits',
+          'totalWholesaleCost',
+          'status',
+          'lines',
+          'createdAtIso',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'ownerId',
+          'poNumber',
+          'storeName',
+          'distributorSummary',
+          'totalCases',
+          'totalUnits',
+          'totalWholesaleCost',
+          'status',
+          'lines',
+          'createdAtIso',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        data.ownerId is string &&
+        isValidId(data.ownerId) &&
+        data.ownerId == request.auth.uid &&
+        data.poNumber is string &&
+        data.poNumber.size() >= 2 &&
+        data.poNumber.size() <= 64 &&
+        data.storeName is string &&
+        data.storeName.size() >= 1 &&
+        data.storeName.size() <= 120 &&
+        data.distributorSummary is string &&
+        data.distributorSummary.size() >= 1 &&
+        data.distributorSummary.size() <= 160 &&
+        data.totalCases is number &&
+        data.totalCases >= 1 &&
+        data.totalCases <= 5000 &&
+        data.totalUnits is number &&
+        data.totalUnits >= 1 &&
+        data.totalUnits <= 100000 &&
+        data.totalWholesaleCost is number &&
+        data.totalWholesaleCost >= 0 &&
+        data.totalWholesaleCost <= 500000 &&
+        data.status is string &&
+        data.status in ['submitted', 'received'] &&
+        data.lines is list &&
+        data.lines.size() >= 1 &&
+        data.lines.size() <= 120 &&
+        data.lines[0] is map &&
+        data.createdAtIso is string &&
+        data.createdAtIso.size() <= 64 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidAuditLog(data) {
+      return data.keys().hasAll([
+          'ownerId',
+          'category',
+          'severity',
+          'actor',
+          'storeName',
+          'action',
+          'details',
+          'timestampIso',
+          'createdAt'
+        ]) &&
+        data.keys().hasOnly([
+          'ownerId',
+          'category',
+          'severity',
+          'actor',
+          'storeName',
+          'doorLabel',
+          'action',
+          'details',
+          'timestampIso',
+          'createdAt'
+        ]) &&
+        data.ownerId is string &&
+        isValidId(data.ownerId) &&
+        data.ownerId == request.auth.uid &&
+        data.category is string &&
+        data.category in ['shelf-audit', 'planogram', 'inventory', 'layout', 'cold-chain', 'csv', 'media', 'system'] &&
+        data.severity is string &&
+        data.severity in ['info', 'success', 'warning', 'critical'] &&
+        data.actor is string &&
+        data.actor.size() >= 1 &&
+        data.actor.size() <= 120 &&
+        data.storeName is string &&
+        data.storeName.size() >= 1 &&
+        data.storeName.size() <= 120 &&
+        (!('doorLabel' in data) || (data.doorLabel is string && data.doorLabel.size() <= 120)) &&
+        data.action is string &&
+        data.action.size() >= 1 &&
+        data.action.size() <= 160 &&
+        data.details is string &&
+        data.details.size() >= 1 &&
+        data.details.size() <= 600 &&
+        data.timestampIso is string &&
+        data.timestampIso.size() <= 64 &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidNotification(data) {
+      return data.keys().hasAll([
+          'ownerId',
+          'category',
+          'severity',
+          'title',
+          'message',
+          'read',
+          'timestampIso',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'ownerId',
+          'category',
+          'severity',
+          'title',
+          'message',
+          'read',
+          'doorId',
+          'targetTab',
+          'timestampIso',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        data.ownerId is string &&
+        isValidId(data.ownerId) &&
+        data.ownerId == request.auth.uid &&
+        data.category is string &&
+        data.category in ['cold-chain', 'stock', 'audit', 'system'] &&
+        data.severity is string &&
+        data.severity in ['info', 'warning', 'critical', 'success'] &&
+        data.title is string &&
+        data.title.size() >= 1 &&
+        data.title.size() <= 160 &&
+        data.message is string &&
+        data.message.size() >= 1 &&
+        data.message.size() <= 500 &&
+        data.read is bool &&
+        (!('doorId' in data) || (data.doorId is string && data.doorId.size() <= 128)) &&
+        (!('targetTab' in data) || (data.targetTab is string && data.targetTab in ['dashboard', 'inventory', 'scan', 'orders', 'reports', 'settings'])) &&
+        data.timestampIso is string &&
+        data.timestampIso.size() <= 64 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidMediaAsset(data) {
+      return data.keys().hasAll([
+          'ownerId',
+          'title',
+          'category',
+          'url',
+          'tags',
+          'createdAtIso',
+          'createdAt'
+        ]) &&
+        data.keys().hasOnly([
+          'ownerId',
+          'title',
+          'category',
+          'url',
+          'storeName',
+          'doorId',
+          'doorLabel',
+          'skuId',
+          'tags',
+          'builtIn',
+          'createdAtIso',
+          'createdAt'
+        ]) &&
+        data.ownerId is string &&
+        isValidId(data.ownerId) &&
+        data.ownerId == request.auth.uid &&
+        data.title is string &&
+        data.title.size() >= 1 &&
+        data.title.size() <= 160 &&
+        data.category is string &&
+        data.category in ['cooler-capture', 'product-pack', 'brand-signage'] &&
+        data.url is string &&
+        data.url.size() >= 1 &&
+        data.url.size() <= 120000 &&
+        (!('storeName' in data) || (data.storeName is string && data.storeName.size() <= 120)) &&
+        (!('doorId' in data) || (data.doorId is string && data.doorId.size() <= 128)) &&
+        (!('doorLabel' in data) || (data.doorLabel is string && data.doorLabel.size() <= 120)) &&
+        (!('skuId' in data) || (data.skuId is string && data.skuId.size() <= 128)) &&
+        data.tags is list &&
+        data.tags.size() <= 16 &&
+        (data.tags.size() == 0 || (data.tags[0] is string && data.tags[0].size() <= 40)) &&
+        (!('builtIn' in data) || data.builtIn is bool) &&
+        data.createdAtIso is string &&
+        data.createdAtIso.size() <= 64 &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidChatMessage(data) {
+      return data.keys().hasAll(['ownerId', 'role', 'modelUsed', 'content', 'createdAt']) &&
+        data.keys().hasOnly(['ownerId', 'role', 'modelUsed', 'content', 'sources', 'createdAt']) &&
+        data.ownerId is string &&
+        isValidId(data.ownerId) &&
+        data.ownerId == request.auth.uid &&
+        data.role is string &&
+        data.role in ['user', 'model'] &&
+        data.modelUsed is string &&
+        data.modelUsed.size() >= 1 &&
+        data.modelUsed.size() <= 80 &&
+        data.content is string &&
+        data.content.size() >= 1 &&
+        data.content.size() <= 8000 &&
+        (!('sources' in data) || (data.sources is list && data.sources.size() <= 20 && (data.sources.size() == 0 || data.sources[0] is map))) &&
+        data.createdAt is timestamp;
+    }
+
+    // --- Collection Rules ---
+
+    // 1. User Workspace Root (non-PII state)
+    match /users/{userId} {
+      allow get: if isValidId(userId) && isOwner(userId);
+      allow list: if false;
+      allow create: if isValidId(userId) &&
+        isVerifiedOwner(userId) &&
+        isValidUserWorkspaceRoot(incoming(), userId) &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+      allow update: if isValidId(userId) &&
+        isVerifiedOwner(userId) &&
+        isValidUserWorkspaceRoot(incoming(), userId) &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        (
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'activeStoreId',
+            'displayName',
+            'operatorRole',
+            'onboardingCompleted',
+            'dismissedChecklist',
+            'completedSteps',
+            'updatedAt'
+          ]) ||
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'planTier',
+            'billingCycle',
+            'doorQuota',
+            'storeCount',
+            'googlePlayLinked',
+            'subscriptionStatus',
+            'updatedAt'
+          ])
+        );
+      allow delete: if isValidId(userId) && isVerifiedOwner(userId);
+
+      // 2. Isolated User PII Document
+      match /private/{docId} {
+        allow get: if isValidId(userId) && docId == 'info' && isOwner(userId);
+        allow list: if false;
+        allow create: if isValidId(userId) &&
+          docId == 'info' &&
+          isVerifiedOwner(userId) &&
+          isValidUserPrivateInfo(incoming(), userId) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          parentUserRootExists(userId);
+        allow update: if isValidId(userId) &&
+          docId == 'info' &&
+          isVerifiedOwner(userId) &&
+          isValidUserPrivateInfo(incoming(), userId) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['email', 'displayName', 'updatedAt']);
+        allow delete: if isValidId(userId) && docId == 'info' && isVerifiedOwner(userId);
+      }
+
+      // 3. Stores (per-store cooler layouts, facings, audits, settings)
+      match /stores/{storeId} {
+        allow get: if isValidId(userId) && isValidId(storeId) && isOwner(userId);
+        allow list: if isOwner(userId) && existing().ownerId == request.auth.uid;
+        allow create: if isValidId(userId) &&
+          isValidId(storeId) &&
+          isVerifiedOwner(userId) &&
+          isValidStoreDocument(incoming(), storeId) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          parentUserRootExists(userId);
+        allow update: if isValidId(userId) &&
+          isValidId(storeId) &&
+          isVerifiedOwner(userId) &&
+          isValidStoreDocument(incoming(), storeId) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().storeId == existing().storeId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'layoutTemplate',
+            'storeName',
+            'storeCode',
+            'address',
+            'routeId',
+            'tempUnit',
+            'settings',
+            'carriedSkuIds',
+            'doors',
+            'insights',
+            'audits',
+            'updatedAt'
+          ]);
+        allow delete: if isValidId(userId) && isValidId(storeId) && isVerifiedOwner(userId);
+      }
+
+      // 4. Custom & Modified Beverage SKUs
+      match /customSkus/{skuId} {
+        allow get: if isValidId(userId) && isValidId(skuId) && isOwner(userId);
+        allow list: if isOwner(userId) && existing().ownerId == request.auth.uid;
+        allow create: if isValidId(userId) &&
+          isValidId(skuId) &&
+          isVerifiedOwner(userId) &&
+          isValidCustomSku(incoming(), skuId) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          parentUserRootExists(userId);
+        allow update: if isValidId(userId) &&
+          isValidId(skuId) &&
+          isVerifiedOwner(userId) &&
+          isValidCustomSku(incoming(), skuId) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().skuId == existing().skuId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'skuCode',
+            'name',
+            'shortName',
+            'brand',
+            'brandLabel',
+            'brandColor',
+            'size',
+            'containerType',
+            'price',
+            'weeklyVelocity',
+            'marginPct',
+            'backroomQty',
+            'parLevel',
+            'primaryColor',
+            'secondaryColor',
+            'capColor',
+            'upc',
+            'distributor',
+            'category',
+            'unitsPerCase',
+            'netCaseCost',
+            'updatedAt'
+          ]);
+        allow delete: if isValidId(userId) && isValidId(skuId) && isVerifiedOwner(userId);
+      }
+
+      // 5. Distributor Purchase Orders (with terminal 'received' locking)
+      match /orders/{orderId} {
+        allow get: if isValidId(userId) && isValidId(orderId) && isOwner(userId);
+        allow list: if isOwner(userId) && existing().ownerId == request.auth.uid;
+        allow create: if isValidId(userId) &&
+          isValidId(orderId) &&
+          isVerifiedOwner(userId) &&
+          isValidOrder(incoming()) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          parentUserRootExists(userId);
+        allow update: if isValidId(userId) &&
+          isValidId(orderId) &&
+          isVerifiedOwner(userId) &&
+          isValidOrder(incoming()) &&
+          existing().status != 'received' &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']);
+        allow delete: if isValidId(userId) && isValidId(orderId) && isVerifiedOwner(userId);
+      }
+
+      // 6. Append-Only Operational Audit Log
+      match /auditLogs/{entryId} {
+        allow get: if isValidId(userId) && isValidId(entryId) && isOwner(userId);
+        allow list: if isOwner(userId) && existing().ownerId == request.auth.uid;
+        allow create: if isValidId(userId) &&
+          isValidId(entryId) &&
+          isVerifiedOwner(userId) &&
+          isValidAuditLog(incoming()) &&
+          incoming().createdAt == request.time &&
+          parentUserRootExists(userId);
+        allow update: if false;
+        allow delete: if isValidId(userId) && isValidId(entryId) && isVerifiedOwner(userId);
+      }
+
+      // 7. Notification Center Items
+      match /notifications/{notifId} {
+        allow get: if isValidId(userId) && isValidId(notifId) && isOwner(userId);
+        allow list: if isOwner(userId) && existing().ownerId == request.auth.uid;
+        allow create: if isValidId(userId) &&
+          isValidId(notifId) &&
+          isVerifiedOwner(userId) &&
+          isValidNotification(incoming()) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          parentUserRootExists(userId);
+        allow update: if isValidId(userId) &&
+          isValidId(notifId) &&
+          isVerifiedOwner(userId) &&
+          isValidNotification(incoming()) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['read', 'updatedAt']);
+        allow delete: if isValidId(userId) && isValidId(notifId) && isVerifiedOwner(userId);
+      }
+
+      // 8. Image Library Assets
+      match /mediaAssets/{assetId} {
+        allow get: if isValidId(userId) && isValidId(assetId) && isOwner(userId);
+        allow list: if isOwner(userId) && existing().ownerId == request.auth.uid;
+        allow create: if isValidId(userId) &&
+          isValidId(assetId) &&
+          isVerifiedOwner(userId) &&
+          isValidMediaAsset(incoming()) &&
+          incoming().createdAt == request.time &&
+          parentUserRootExists(userId);
+        allow update: if false;
+        allow delete: if isValidId(userId) && isValidId(assetId) && isVerifiedOwner(userId);
+      }
+
+      // 9. Copilot & Search Grounding Chat Messages
+      match /chats/{messageId} {
+        allow get: if isValidId(userId) && isValidId(messageId) && isOwner(userId);
+        allow list: if isOwner(userId) && existing().ownerId == request.auth.uid;
+        allow create: if isValidId(userId) &&
+          isValidId(messageId) &&
+          isVerifiedOwner(userId) &&
+          isValidChatMessage(incoming()) &&
+          incoming().createdAt == request.time &&
+          parentUserRootExists(userId);
+        allow update: if false;
+        allow delete: if isValidId(userId) && isValidId(messageId) && isVerifiedOwner(userId);
+      }
+    }
+  }
+}

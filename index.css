@@ -1,0 +1,157 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --kq-canvas: #f3f6fa;
+    --kq-surface: #ffffff;
+    --kq-surface-muted: #eaf0f6;
+    --kq-surface-elevated: #e1e9f3;
+    --kq-header: rgba(255, 255, 255, 0.92);
+    --kq-cabinet: #0f172a;
+    --kq-cabinet-slot: #172338;
+    --kq-text: #0f172a;
+    --kq-text-secondary: #475569;
+    --kq-text-muted: #64748b;
+    --kq-accent: #0284c7;
+    --kq-accent-hover: #0369a1;
+    --kq-accent-fg: #ffffff;
+    --kq-accent-soft: rgba(2, 132, 199, 0.1);
+    --kq-accent-border: rgba(2, 132, 199, 0.35);
+    --kq-teal: #0d9488;
+    --kq-emerald: #059669;
+    --kq-emerald-soft: rgba(5, 150, 105, 0.1);
+    --kq-emerald-text: #065f46;
+    --kq-amber: #d97706;
+    --kq-amber-soft: rgba(217, 119, 6, 0.11);
+    --kq-amber-text: #92400e;
+    --kq-crimson: #dc2626;
+    --kq-crimson-soft: rgba(220, 38, 38, 0.09);
+    --kq-crimson-text: #991b1b;
+    --kq-border: rgba(15, 23, 42, 0.1);
+    --kq-border-strong: rgba(15, 23, 42, 0.18);
+    --kq-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 4px 16px rgba(15, 23, 42, 0.04);
+    color-scheme: light;
+  }
+
+  .dark {
+    --kq-canvas: #0b1018;
+    --kq-surface: #131a24;
+    --kq-surface-muted: #0e141d;
+    --kq-surface-elevated: #1b2433;
+    --kq-header: rgba(11, 16, 24, 0.92);
+    --kq-cabinet: #080c14;
+    --kq-cabinet-slot: #141d2b;
+    --kq-text: #f1f5f9;
+    --kq-text-secondary: #94a3b8;
+    --kq-text-muted: #64748b;
+    --kq-accent: #38bdf8;
+    --kq-accent-hover: #7dd3fc;
+    --kq-accent-fg: #082f49;
+    --kq-accent-soft: rgba(56, 189, 248, 0.14);
+    --kq-accent-border: rgba(56, 189, 248, 0.42);
+    --kq-teal: #2dd4bf;
+    --kq-emerald: #10b981;
+    --kq-emerald-soft: rgba(16, 185, 129, 0.14);
+    --kq-emerald-text: #a7f3d0;
+    --kq-amber: #f59e0b;
+    --kq-amber-soft: rgba(245, 158, 11, 0.14);
+    --kq-amber-text: #fde68a;
+    --kq-crimson: #ef4444;
+    --kq-crimson-soft: rgba(239, 68, 68, 0.14);
+    --kq-crimson-text: #fecaca;
+    --kq-border: rgba(255, 255, 255, 0.1);
+    --kq-border-strong: rgba(255, 255, 255, 0.18);
+    --kq-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    color-scheme: dark;
+  }
+
+  html {
+    font-family: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--kq-canvas);
+    color: var(--kq-text);
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  .font-mono-tabular {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* KoolerIQ Nordic Frost & Cobalt Steel Surfaces */
+.glacier-card {
+  background-color: var(--kq-surface);
+  border: 1px solid var(--kq-border);
+  box-shadow: var(--kq-shadow);
+}
+
+.glacier-glass {
+  background-color: var(--kq-surface);
+  border: 1px solid var(--kq-accent-border);
+  box-shadow: var(--kq-shadow);
+}
+
+.glacier-hud {
+  background-color: var(--kq-surface);
+  border: 1px solid var(--kq-accent-border);
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.2);
+}
+
+.dark .glacier-hud {
+  background-color: rgba(19, 26, 36, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+}
+
+/* Cooler glass shelf reflection inside dark cabinet */
+.cooler-shelf-ledge {
+  background: linear-gradient(180deg, rgba(186, 230, 253, 0.18) 0%, rgba(15, 23, 42, 0.92) 100%);
+  border-top: 1px solid rgba(186, 230, 253, 0.28);
+}
+
+/* Laser scan sweep animation */
+@keyframes scanSweep {
+  0% {
+    transform: translateY(0%);
+    opacity: 0.95;
+  }
+  50% {
+    transform: translateY(420%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0%);
+    opacity: 0.95;
+  }
+}
+
+.animate-scan-sweep {
+  animation: scanSweep 2.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-scan-sweep {
+    animation: none;
+  }
+}
+
+/* Clean custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--kq-canvas);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--kq-border-strong);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--kq-text-muted);
+}
